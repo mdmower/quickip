@@ -1,0 +1,17 @@
+{
+	"browser_action": {
+		"default_icon": "icons/icon48.png",
+		"default_popup": "bubble.html",
+		"default_title": "Obtain your IP"
+	},
+	"description": "Obtain and copy your IP address",
+	"icons": {
+		"128": "icons/icon128.png",
+		"48": "icons/icon48.png",
+		"16": "icons/icon16.png"
+	},
+	"manifest_version": 2,
+	"name": "QuickIP",
+	"permissions": [ "clipboardWrite", "http://checkip.dyndns.org/" ],
+	"version": "1.0.2"
+}
