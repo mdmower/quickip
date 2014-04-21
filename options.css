@@ -1,0 +1,78 @@
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+
+.dragged {
+    position: absolute;
+    top: 0;
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+.icon-move {
+    display: inline-block;
+    background-image: url('img/cross-arrow.png');
+    height: 20px;
+    width: 20px;
+    vertical-align: middle;
+}
+
+div#list_container {
+    width:280px;
+}
+
+ol.sortable_list {
+    padding-left: 10px;
+    list-style-type: none;
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+ol.sortable_list li {
+    display: block;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    color: #0088cc;
+    background: #eeeeee;
+}
+
+ol.sortable_list li.placeholder {
+    position: relative;
+    height: 21px;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    color: #0088cc;
+    background: #fff;
+}
+
+ol.sortable_list li.placeholder:before {
+    position: absolute;
+}
+
+a.ip_link {
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+input.ip_checkbox {
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+input.ip_input {
+    margin-left: 5px;
+    height: 16px;
+    width: 194px;
+}
+
+p#enable_all {
+    margin-top: 4px;
+    text-align: center;
+}
+
+span#status {
+    
+}
