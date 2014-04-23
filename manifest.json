@@ -10,6 +10,15 @@
 		"default_popup": "bubble.html",
 		"default_title": "Obtain your IP"
 	},
+	"commands": {
+		"quickip-copy": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+U",
+				"mac": "Command+Shift+U"
+			},
+			"description": "Copy IP to clipboard"
+		}
+	},
 	"description": "Obtain and copy your IP address",
 	"icons": {
 		"128": "icons/icon128.png",
