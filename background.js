@@ -77,7 +77,7 @@ function getEnabledSources() {
 
   var curl = localStorage["custom_url"];
   var curlIndex = enabledSources.indexOf("customurl");
-  
+
   if ((typeof curl == 'undefined' || curl == "") && curlIndex >= 0) {
     enabledSources.splice(curlIndex, 1);
   }
