@@ -64,14 +64,11 @@ function getIpSourceSelection() {
 }
 
 function sortifyList() {
-  $("ol.sortable_list").sortable({
-    group: 'ip-sources',
-    handle: 'div.icon-move',
-    onDrop: function  (item, targetContainer, _super) {
-      saveOptions("ip_source_order")
-      _super(item)
-    }
-  })
+  $('.sortable').sortable({
+    handle: '.handle',
+    placeholder: 'ui-sortable-placeholder',
+    update: function(event, ui) { saveOptions("ip_source_order") }
+  });
 }
 
 function startListeners() {
@@ -306,22 +303,24 @@ function htmlListSrc(ipsrc) {
   if (ipsrc != "customurl") {
     var l = $('<li>');
     l.attr({ id: ipsrc });
-    var d = $('<div>').addClass("icon-move");
+    var s = $('<span>').addClass("handle");
+    s.html("::");
     var i = $('<input/>').addClass("ip_checkbox");
     i.attr({ type: "checkbox", id: "cb_" + ipsrc, value: ipsrc });
     var a = $('<a>').addClass("ip_link");
     a.attr({ href: srcInfo(ipsrc)[0], target: '_blank' });
     a.html(srcInfo(ipsrc)[1]);
-    li = l.append([d,i,a]);
+    li = l.append([s,i,a]);
   } else {
     var l = $('<li>');
     l.attr({ id: ipsrc });
-    var d = $('<div>').addClass("icon-move");
+    var s = $('<span>').addClass("handle");
+    s.html("::");
     var ia = $('<input/>').addClass("ip_checkbox");
     ia.attr({ type: "checkbox", id: "cb_" + ipsrc, value: ipsrc });
     var ib = $('<input/>').addClass("ip_input");
-    ib.attr({ type: "text", id: "custom_url_input", placeholder: "custom url" });
-    li = l.append([d,ia,ib]);
+    ib.attr({ type: "text", id: "custom_url_input", placeholder: " custom url" });
+    li = l.append([s,ia,ib]);
   }
   return li;
 }

@@ -21,7 +21,7 @@
 <meta charset="utf-8"/>
 <link rel="stylesheet" type="text/css" href="options.css">
 <script type="text/javascript" src="jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="jquery-sortable-min.js"></script>
+<script type="text/javascript" src="jquery-ui.min.js"></script>
 <script type="text/javascript" src="ipsources.js"></script>
 <script type="text/javascript" src="options.js"></script>
 </head>
@@ -31,9 +31,8 @@
     <div style="clear:both;">
         <p>Prioritize IP resolvers via drag-and-drop</p>
         <div id="list_container">
-        <ol class="sortable_list vertical" id="ip_source_list">
-        </ol>
-        <p id="enable_all"><a href="#">Enable All</a></p>
+            <ul class="sortable" id="ip_source_list"></ul>
+            <p id="enable_all"><a href="#">Enable All</a></p>
         </div>
         <p id="status_box">Status: <span id="status">Idle</span></p>
 
