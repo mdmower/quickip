@@ -9,18 +9,24 @@ body {
   margin: 3px 4px;
   padding: 0;
   min-width: 190px;
-  min-height: 25px;
   overflow-x: hidden;
 }
 
+#containerDiv {
+  display: flex;
+  flex: 1;
+}
+
 #textOut {
-  float: left;
+  order: 1;
+  flex: 1;
   width: 130px;
   text-align: center;
 }
 
 #copyButton {
-  float: right;
+  margin-left: 4px;
+  order: 2;
 }
 </style>
 
