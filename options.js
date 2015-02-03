@@ -178,6 +178,15 @@ function validateUrlInput() {
 function checkSourcePermissions(source) {
   var chkd = $("#cb_" + source).prop('checked');
 
+  if (srcInfo(source)[3] == false) {
+    if (chkd) {
+      reportSourcePermissions(source, "enable", true);
+    } else {
+      reportSourcePermissions(source, "disable", true);
+    }
+    return;
+  }
+
   var ipPerm = [];
   if (source == "customurl") {
     ipPerm.push("http://*/");
