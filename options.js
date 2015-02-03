@@ -178,7 +178,7 @@ function validateUrlInput() {
 function checkSourcePermissions(source) {
   var chkd = $("#cb_" + source).prop('checked');
 
-  if (srcInfo(source)[3] == false) {
+  if (srcInfo(source).optional == false) {
     if (chkd) {
       reportSourcePermissions(source, "enable", true);
     } else {
@@ -192,7 +192,7 @@ function checkSourcePermissions(source) {
     ipPerm.push("http://*/");
     ipPerm.push("https://*/");
   } else {
-    ipPerm.push(srcInfo(source)[2]);
+    ipPerm.push(srcInfo(source).perm);
   }
 
   if(chkd) {
@@ -317,8 +317,8 @@ function htmlListSrc(ipsrc) {
     var i = $('<input/>').addClass("ip_checkbox");
     i.attr({ type: "checkbox", id: "cb_" + ipsrc, value: ipsrc });
     var a = $('<a>').addClass("ip_link");
-    a.attr({ href: srcInfo(ipsrc)[0], target: '_blank' });
-    a.html(srcInfo(ipsrc)[1]);
+    a.attr({ href: srcInfo(ipsrc).url, target: '_blank' });
+    a.html(srcInfo(ipsrc).name);
     li = l.append([s,i,a]);
   } else {
     var l = $('<li>');

@@ -114,7 +114,7 @@ function requestIP(sources, attempt) {
   }
 
   var src = sources[attempt];
-  var url = srcInfo(src)[0];
+  var url = srcInfo(src).url;
   if (src == "customurl") {
     url = localStorage["custom_url"];
   }

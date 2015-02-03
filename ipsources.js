@@ -38,5 +38,10 @@ function srcInfo(ipsrc) {
   default:
     break;
   }
-  return [ ipurl, ipname, ipperm, ipoptional ];
+  return {
+    url: ipurl,
+    name: ipname,
+    perm: ipperm,
+    optional: ipoptional
+  };
 }
