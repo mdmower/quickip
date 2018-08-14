@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2013 Matthew D. Mower
+# Copyright (C) 2013-2018 Matthew D. Mower
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,4 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-zip -r quickip.zip . -x ".git/*" "Readme.md" "zip_extension.sh" "quickip.zip" "LICENSE"
+zip -r quickip.zip . -x ".git*" ".jshintrc" "Readme.md" "zip_extension.sh" "quickip.zip" "LICENSE"

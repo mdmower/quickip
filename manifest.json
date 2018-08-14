@@ -1,41 +1,57 @@
 {
 	"background": {
 		"scripts": [
-			"jquery-min.js",
-			"ipsources.js",
 			"background.js"
-	]},
+		]
+	},
 	"browser_action": {
-		"default_icon": "icons/icon48.png",
+		"default_icon": {
+			"16": "icons/icon16.png",
+			"19": "icons/icon19.png",
+			"24": "icons/icon24.png",
+			"32": "icons/icon32.png",
+			"38": "icons/icon38.png",
+			"48": "icons/icon48.png"
+		},
 		"default_popup": "bubble.html",
 		"default_title": "Obtain your IP"
 	},
 	"commands": {
-		"quickip-copy": {
+		"quick-copy-ipv4": {
 			"suggested_key": {
 				"default": "Ctrl+Shift+U",
 				"mac": "Command+Shift+U"
 			},
-			"description": "Copy IP to clipboard"
+			"description": "Copy IPv4 to clipboard"
+		},
+		"quick-copy-ipv6": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+Y",
+				"mac": "Command+Shift+Y"
+			},
+			"description": "Copy IPv6 to clipboard"
 		}
 	},
 	"description": "Obtain and copy your IP address",
 	"icons": {
-		"128": "icons/icon128.png",
+		"16": "icons/icon16.png",
+		"19": "icons/icon19.png",
+		"24": "icons/icon24.png",
+		"32": "icons/icon32.png",
+		"38": "icons/icon38.png",
 		"48": "icons/icon48.png",
-		"16": "icons/icon16.png"
+		"128": "icons/icon128.png"
 	},
 	"manifest_version": 2,
 	"name": "QuickIP",
 	"options_page": "options.html",
 	"permissions": [
 		"clipboardWrite",
-		"http://checkip.dyndns.org/" ],
-	"optional_permissions": [
-		"http://www.checkip.org/",
-		"http://ipv4.icanhazip.com/",
-		"http://ifconfig.me/",
-		"http://*/",
-		"https://*/" ],
-	"version": "2.0.2"
+		"storage",
+		"https://*.ipify.org/",
+		"https://*.ident.me/",
+		"https://*.icanhazip.com/",
+		"https://*.wtfismyip.com/"
+	],
+	"version": "3.0.0"
 }

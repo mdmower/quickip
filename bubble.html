@@ -1,45 +1,33 @@
 <!DOCTYPE html>
+<!--
+ * Copyright (C) 2014-2018 Matthew D. Mower
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
 <html>
 <head>
-<title>Quick IP</title>
-
-<style type="text/css">
-body {
-  font-size: 100%;
-  margin: 3px 4px;
-  padding: 0;
-  min-width: 190px;
-  overflow-x: hidden;
-}
-
-#containerDiv {
-  display: flex;
-  flex: 1;
-}
-
-#textOut {
-  order: 1;
-  flex: 1;
-  width: 130px;
-  text-align: center;
-}
-
-#copyButton {
-  margin-left: 4px;
-  order: 2;
-}
-</style>
-
-<script type="text/javascript" src="jquery-min.js"></script>
-<script type="text/javascript" src="ipsources.js"></script>
-<script type="text/javascript" src="bubble.js"></script>
-
+    <title>Quick IP</title>
+    <link rel="stylesheet" type="text/css" href="bubble.css">
+    <script src="bubble.js"></script>
 </head>
-
 <body>
-<div id="containerDiv">
-  <input id="textOut" type="text" placeholder="Loading..." />
-  <button id="copyButton" type="button" autofocus>Copy</button>
-</div>
+    <div id="container">
+        <template id="output-template">
+            <div class="output">
+                <label><span></span> <input type="text" readonly placeholder="Loading..."></label><button>Copy</button>
+            </div>
+        </template>
+    </div>
 </body>
 </html>

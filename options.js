@@ -1,335 +1,288 @@
-/*
-    Copyright (C) 2014 Matthew D. Mower
+/**
+ * @license Copyright (C) 2014-2018 Matthew D. Mower
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-         http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
+var sourceInfo = chrome.extension.getBackgroundPage().sourceInfo;
+// var getOption = chrome.extension.getBackgroundPage().getOption;
+// var getOptions = chrome.extension.getBackgroundPage().getOptions;
+// var setOption = chrome.extension.getBackgroundPage().setOption;
+var setOptions = chrome.extension.getBackgroundPage().setOptions;
 
 document.addEventListener('DOMContentLoaded', function () {
-  initListElements();
-  getIpSourceSelection();
-  sortifyList();
-  startListeners();
+    initSourceLists();
+    initVersionOptions();
+    sortifyList();
+    toggleListeners(true);
+    document.getElementById('extensionVersion').innerHTML = chrome.app.getDetails().version;
 }, false);
 
-function initListElements() {
-  var src = [];
-  var srcsStored = localStorage["ip_source_order"];
-  if (typeof srcsStored != 'undefined') {
-    src = checkSrcOrder(srcsStored);
-  } else {
-    src = srcs;
-  }
-
-  // Update stored sources in case changes occurred
-  localStorage["ip_source_order"] = src.join(",");
-
-  for (var i = 0; i < src.length; i++) {
-    $("#ip_source_list").append(htmlListSrc(src[i]));
-  }
-
-  var curl = localStorage["custom_url"];
-  if (typeof curl != 'undefined') {
-    $("#custom_url_input").val(curl);
-  } else {
-    localStorage["custom_url"] = "";
-  }
-}
-
-function getIpSourceSelection() {
-  var ipsrc;
-  for (var i = 0; i < srcs.length; i++) {
-    ipsrc = localStorage["cb_" + srcs[i]];
-    if (typeof ipsrc != 'undefined') {
-      var onoff = (ipsrc === 'true');
-      $("#cb_" + srcs[i]).prop('checked', onoff);
-    } else {
-      $("#cb_" + srcs[i]).prop('checked', false);
+/**
+ * Listen for messages from the background
+ */
+chrome.runtime.onMessage.addListener(function(request) {
+    switch (request.cmd) {
+    case 'settings_updated':
+        notify('Updated settings are available. Please refresh this page.', true);
+        break;
+    default:
+        break;
     }
-  }
+});
 
-  if ($(".ip_checkbox:checked").length == 0) {
-    $("#cb_" + srcs[1]).prop('checked', true);
-    saveIpSourceSelection();
-  }
+/**
+ * Make sure text is safe for insertion into innerHTML
+ */
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
+/**
+ * Prepare and show a modal with a message. If 'refresh' is true,
+ * then a Refresh button is shown instead of 'OK' and the user must
+ * refresh the page.
+ */
+function notify(msg, refresh) {
+    var notifyElement = document.getElementById('notify');
+    notifyElement.querySelector('.msg').innerHTML = escapeHtml(msg);
+    var button = notifyElement.querySelector('button');
+
+    function reload(event) {
+        location.reload();
+    }
+
+    function closeModal(event) {
+        if ((event.type === 'keyup' && event.key === 'Escape') ||
+                (event.type === 'click' && event.target === button)) {
+            notifyElement.style.display = 'none';
+            document.removeEventListener('keyup', closeModal);
+        }
+    }
+
+    if (refresh) {
+        button.innerHTML = 'Refresh';
+        button.onclick = reload;
+    } else {
+        button.innerHTML = 'OK';
+        button.onclick = closeModal;
+        document.addEventListener('keyup', closeModal);
+    }
+
+    notifyElement.style.display = 'block';
+    button.focus();
+}
+
+/**
+ * Create version selection from template
+ */
+function initVersionOptions() {
+    var versions = sourceInfo.getVersions();
+    versions.forEach((version) => {
+        var versionData = sourceInfo.getVersionData(version);
+
+        // Append version options
+        var template = document.getElementById('version_states_template');
+        var clone = document.importNode(template.content, true);
+        clone.querySelector('label').innerHTML += versionData.name;
+        clone.querySelector('input').setAttribute('data-version', version);
+        clone.querySelector('input').checked = versionData.enabled;
+        document.getElementById('version-states-container').appendChild(clone);
+    });
+}
+
+/**
+ * Create source list from template
+ */
+function initSourceLists() {
+    var versions = sourceInfo.getVersions();
+    versions.forEach((version) => {
+        var versionData = sourceInfo.getVersionData(version);
+
+        // Append list container to page
+        var template = document.getElementById('list-container-template');
+        var clone = document.importNode(template.content, true);
+        clone.querySelector('.title').innerHTML += versionData.name;
+        var dataSelectors = '.list-container,.enable-all,.sortable';
+        Array.from(clone.querySelectorAll(dataSelectors)).forEach((elm) => {
+            elm.setAttribute('data-version', version);
+        });
+        document.getElementById('sources-container').appendChild(clone);
+
+        // Populate <ul> with sources
+        var sources = sourceInfo.getOrderedIds(version).map(id => sourceInfo.getSource(version, id));
+        var sourceList = document.querySelector('.sortable[data-version="' + version + '"]');
+        sources.forEach((source) => {
+            sourceList.appendChild(generateSourceListItem(version, source));
+        });
+    });
+}
+
+/**
+ * Create source option from template
+ */
+function generateSourceListItem(version, source) {
+    var template = document.getElementById('sortable_li_template');
+    var clone = document.importNode(template.content, true);
+
+    var dataSelectors = 'li,.handle,input,a';
+    Array.from(clone.querySelectorAll(dataSelectors)).forEach((elm) => {
+        elm.setAttribute('data-version', version);
+        elm.setAttribute('data-id', source.id);
+    });
+
+    if (source.enabled)
+        clone.querySelector('input').setAttribute('checked', '');
+
+    var a = clone.querySelector('a');
+    a.setAttribute('href', source.url);
+    a.innerHTML = source.name;
+
+    return clone;
+}
+
+/**
+ * Make source lists sortable
+ */
 function sortifyList() {
-  $('.sortable').sortable({
-    handle: '.handle',
-    placeholder: 'ui-sortable-placeholder',
-    update: function(event, ui) { saveOptions("ip_source_order") }
-  });
-}
-
-function startListeners() {
-  $("#custom_url_input").change(function() {
-    saveOptions("custom_url");
-  });
-  $(".ip_checkbox").change(function() {
-    if(this.value == "customurl") {
-      if (validateUrlInput() == "valid") {
-        checkSourcePermissions(this.value);
-      }
-    } else {
-      checkSourcePermissions(this.value);
-    }
-  });
-  $("#enable_all a").click(function() {
-    setBulkPermissions();
-  });
-}
-
-function checkSrcOrder(list) {
-  var src = list.split(',');
-
-  // Remove non-existent sources
-  for (i = 0; i < src.length; i++) {
-    if (srcs.indexOf(src[i]) < 0) {
-      src.splice(i, 1);
-      i--;
-    }
-  }
-
-  // Remove duplicate sources without sorting
-  var sourcename = "";
-  for (i = 0; i < src.length; i++) {
-    sourcename = src[i];
-    src = $.grep(src, function(n, j) {
-      return n != src[i];
+    Array.from(document.querySelectorAll('ul.sortable')).forEach((list) => {
+        new Sortable(list, {
+            ghostClass: 'ui-sortable-placeholder',
+            onUpdate: saveOptions,
+        });
     });
-    src.splice(i, 0, sourcename);
-  }
-
-  // Add missing sources
-  if (src.length < srcs.length) {
-    for (i = 0; i < srcs.length; i++) {
-      if (src.indexOf(srcs[i]) < 0) {
-        src.push(srcs[i]);
-      }
-    }
-  }
-
-  return src;
 }
 
-function saveIpSourceSelection() {
-  for (var i = 0; i < srcs.length; i++) {
-    localStorage["cb_" + srcs[i]] = $("#cb_" + srcs[i]).prop('checked');
-  }
-}
-
-function saveOptions(item) {
-  switch(item) {
-  case "custom_url": // save regardless of validity
-    localStorage["custom_url"] = $("#custom_url_input").val();
-    validateUrlInput();
-    break;
-  case "ip_source_order":
-    localStorage["ip_source_order"] = getIpSourceOrder();
-    showNotice("saved");
-    break;
-  case "ip_source_onoff":
-    saveIpSourceSelection();
-    showNotice("saved");
-    break;
-  }
-}
-
-function getIpSourceOrder() {
-  var ipso = [];
-  var listelms = $("#ip_source_list").children();
-  for (var i = 0; i < listelms.length; i++) {
-    ipso.push(listelms[i].id);
-  }
-  return ipso.join(',');
-}
-
-function validateUrlInput() {
-  var textinput = $("#custom_url_input").val();
-  var urlregex = new RegExp("^(http|https|ftp)\://"); // not comprehensive
-  var ret = "";
-
-  if (textinput == "") {
-    ret = "empty";
-    $("#cb_customurl").prop('checked', false);
-    showNotice("empty_url");
-  } else if (urlregex.test(textinput)) {
-    ret = "valid";
-    showNotice("saved");
-  } else {
-    ret = "invalid";
-    $("#cb_customurl").prop('checked', false);
-    showNotice("invalid_url");
-  }
-
-  return ret;
-}
-
-function checkSourcePermissions(source) {
-  var chkd = $("#cb_" + source).prop('checked');
-
-  if (srcInfo(source).optional == false) {
-    if (chkd) {
-      reportSourcePermissions(source, "enable", true);
-    } else {
-      reportSourcePermissions(source, "disable", true);
-    }
-    return;
-  }
-
-  var ipPerm = [];
-  if (source == "customurl") {
-    ipPerm.push("http://*/");
-    ipPerm.push("https://*/");
-  } else {
-    ipPerm.push(srcInfo(source).perm);
-  }
-
-  if(chkd) {
-    chrome.permissions.request({
-      origins: ipPerm
-    }, function(granted) {
-      if(granted) {
-        reportSourcePermissions(source, "enable", true);
-      } else {
-        reportSourcePermissions(source, "enable", false);
-      }
+/**
+ * Toggle all sources to enabled for a specific IP version
+ */
+function enableAllSources(event) {
+    var version = event.target.getAttribute('data-version');
+    Array.from(document.querySelectorAll('#sources-container input[data-version="' + version + '"]')).forEach((input) => {
+        input.checked = true;
     });
-  } else {
-    chrome.permissions.remove({
-      origins: ipPerm
-    }, function(removed) {
-      if (removed) {
-        reportSourcePermissions(source, "disable", true);
-      } else {
-        reportSourcePermissions(source, "disable", false);
-      }
+    saveOptions();
+}
+
+/**
+ * Handle link to extension shortcut options (<a> not allowed)
+ */
+function openShortcutsConfig(event) {
+    event.preventDefault();
+    chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+}
+
+/**
+ * Restore all settings to defaults
+ */
+function restoreDefaults() {
+    sourceInfo.restoreData();
+    // If any settings are stored, this will trigger the refresh modal
+    chrome.storage.sync.clear();
+}
+
+/**
+ * Map element selectors to events and callbacks
+ */
+var listenerMap = [
+    { selector: '#version-states-container input[name="version_states"]', event: 'change', callback: saveOptions },
+    { selector: '#sources-container input[data-id]', event: 'change', callback: saveOptions },
+    { selector: '#sources-container .enable-all', event: 'click', callback: enableAllSources },
+    { selector: '#keyboard-shortcut-config', event: 'click', callback: openShortcutsConfig },
+    { selector: '#restore-defaults', event: 'click', callback: restoreDefaults },
+];
+
+/**
+ * Toggle all event listeners on/off
+ */
+function toggleListeners(enable) {
+    listenerMap.forEach((listenerData) => {
+        Array.from(document.querySelectorAll(listenerData.selector)).forEach((elm) => {
+            if (enable)
+                elm.addEventListener(listenerData.event, listenerData.callback);
+            else
+                elm.removeEventListener(listenerData.event, listenerData.callback);
+        });
     });
-  }
 }
 
-function setBulkPermissions() {
-  var ipPerm = [];
-  ipPerm.push("http://*/");
-  ipPerm.push("https://*/");
+/**
+ * Save all options to storage
+ */
+function saveOptions() {
+    toggleListeners(false);
+    var options = {};
 
-  chrome.permissions.request({
-    origins: ipPerm
-  }, function(granted) {
-    if(granted) {
-      reportBulkPermissions(true);
-    } else {
-      reportBulkPermissions(false);
+    sourceInfo.getVersions().forEach((version) => {
+        var sourceOrder = getSourceOrder(version);
+        var enabledSources = getEnabledSources(version);
+        if (enabledSources.length === 0) {
+            var defaultId = sourceInfo.getDefaultId(version);
+            var defaultSource = sourceInfo.getSource(version, defaultId);
+            enabledSources.push(defaultId);
+            document.querySelector('#sources-container input[data-version="' + version + '"][data-id="' + defaultId + '"]').checked = true;
+            notify('At least one source must be enabled for each IP version. "' + defaultSource.name + '" has been automatically enabled.');
+        }
+
+        var states = {};
+        sourceOrder.forEach((id, index) => {
+            states[id] = {
+                order: index,
+                enabled: enabledSources.indexOf(id) >= 0,
+            };
+            if (sourceInfo.data[version].sources.hasOwnProperty(id))
+                Object.assign(sourceInfo.data[version].sources[id], states[id]);
+        });
+        options['source_states_' + version] = states;
+    });
+
+    var versionStates = {};
+    if (document.querySelectorAll('#version-states-container input:checked').length === 0) {
+        var defaultVersion = sourceInfo.getDefaultVersion();
+        var defaultVersionData = sourceInfo.getVersionData(defaultVersion);
+        document.querySelector('#version-states-container input[data-version="' + defaultVersion + '"]').checked = true;
+        notify('At least one IP version must be enabled. "' + defaultVersionData.name + '" has been automatically enabled.');
     }
-  });
+    Array.from(document.querySelectorAll('#version-states-container input')).forEach((input) => {
+        var version = input.getAttribute('data-version');
+        versionStates[version] = input.checked;
+        if (sourceInfo.data.hasOwnProperty(version))
+            sourceInfo.data[version].enabled = input.checked;
+    });
+    options.version_states = versionStates;
+
+    setOptions(options)
+    .then(() => toggleListeners(true));
 }
 
-function reportSourcePermissions(source, onoff, success) {
-  switch(onoff) {
-  case "enable":
-    if (!success) {
-      $("#cb_" + source).prop('checked', false);
-      showNotice("perm_cancel");
-      return;
-    }
-    break;
-  case "disable":
-    // Allow checkbox to be unselected, even if perm not removed
-    break;
-  }
-  saveOptions("ip_source_onoff");
+/**
+ * Get the order of sources for a specific IP version from the page
+ */
+function getSourceOrder(version) {
+    return Array.from(document.querySelectorAll('#sources-container li[data-version="' + version + '"]'))
+    .map(li => li.getAttribute('data-id'));
 }
 
-function reportBulkPermissions(success) {
-  if (success) {
-    $(".ip_checkbox:not(:checked)").prop('checked', true);
-    validateUrlInput();
-    saveOptions("ip_source_onoff");
-  } else {
-    showNotice("perm_cancel");
-  }
-}
-
-function showNotice(message) {
-  $.when(setupNotice(message)).done(function() {
-     resetStatus();
-  });
-}
-
-function setupNotice(message) {
-  $("#status").stop(true);
-  var dfd = new jQuery.Deferred();
-  switch(message) {
-  case "saved":
-    $("#status").css("display", "none");
-    $("#status").css("color", "DarkGreen");
-    $("#status").html("Saved");
-    $("#status").fadeIn(300).delay(1400).fadeOut(300);
-    break;
-  case "invalid_url":
-    $("#status").css("display", "none");
-    $("#status").css("color", "DarkRed");
-    $("#status").html("Invalid URL");
-    $("#status").fadeIn(300).delay(1400).fadeOut(300);
-    break;
-  case "empty_url":
-    $("#status").css("display", "none");
-    $("#status").css("color", "DarkRed");
-    $("#status").html("No URL entered");
-    $("#status").fadeIn(300).delay(1400).fadeOut(300);
-    break;
-  case "perm_cancel":
-    $("#status").css("display", "none");
-    $("#status").css("color", "#cc9900");
-    $("#status").html("Permissions request canceled");
-    $("#status").fadeIn(300).delay(1400).fadeOut(300);
-    break;
-  }
-  setTimeout(function() {
-    dfd.resolve();
-  }, 2020);
-  return dfd.promise();
-}
-
-function resetStatus() {
-  $("#status").fadeIn(100);
-  $("#status").css("color", "black");
-  $("#status").html("Idle");
-}
-
-function htmlListSrc(ipsrc) {
-  var li = '';
-  if (ipsrc != "customurl") {
-    var l = $('<li>');
-    l.attr({ id: ipsrc });
-    var s = $('<span>').addClass("handle");
-    s.html("::");
-    var i = $('<input/>').addClass("ip_checkbox");
-    i.attr({ type: "checkbox", id: "cb_" + ipsrc, value: ipsrc });
-    var a = $('<a>').addClass("ip_link");
-    a.attr({ href: srcInfo(ipsrc).url, target: '_blank' });
-    a.html(srcInfo(ipsrc).name);
-    li = l.append([s,i,a]);
-  } else {
-    var l = $('<li>');
-    l.attr({ id: ipsrc });
-    var s = $('<span>').addClass("handle");
-    s.html("::");
-    var ia = $('<input/>').addClass("ip_checkbox");
-    ia.attr({ type: "checkbox", id: "cb_" + ipsrc, value: ipsrc });
-    var ib = $('<input/>').addClass("ip_input");
-    ib.attr({ type: "text", id: "custom_url_input", placeholder: " custom url" });
-    li = l.append([s,ia,ib]);
-  }
-  return li;
+/**
+ * Get the enabled sources for a specific IP version from the page
+ */
+function getEnabledSources(version) {
+    return Array.from(document.querySelectorAll('#sources-container input[data-version="' + version + '"]'))
+    .filter(input => input.checked)
+    .map(input => input.getAttribute('data-id'));
 }
