@@ -393,7 +393,7 @@ function requestIP(version, ids, attempt) {
     // Prepare for next iteration, if necessary
     attempt += 1;
 
-    return fetch(url, {cache: 'no-cache'})
+    return fetch(url, {cache: 'no-store'})
     .then(response => response.text())
     .then(ip => {
         ip = ip.trim();
