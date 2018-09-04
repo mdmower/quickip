@@ -14,4 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-zip -r quickip.zip . -x ".git*" ".jshintrc" "Readme.md" "zip_extension.sh" "quickip.zip" "LICENSE"
+zip -r quickip.zip . -x ".git*" ".jshintrc" "Readme.md" "zip_extension.sh" "quickip.zip" "LICENSE" "icons/*.svg" "icons/icon512.png"
