@@ -14,7 +14,7 @@
 			"48": "icons/icon48.png"
 		},
 		"default_popup": "bubble.html",
-		"default_title": "Obtain your IP"
+		"default_title": "Find your IP"
 	},
 	"commands": {
 		"quick-copy-ipv4": {
@@ -32,7 +32,7 @@
 			"description": "Copy IPv6 to clipboard"
 		}
 	},
-	"description": "Obtain and copy your IP address",
+	"description": "Quickly obtain and copy your public IPv4 and IPv6 addresses",
 	"icons": {
 		"16": "icons/icon16.png",
 		"19": "icons/icon19.png",
@@ -53,5 +53,5 @@
 		"https://*.icanhazip.com/",
 		"https://*.wtfismyip.com/"
 	],
-	"version": "3.0.1"
+	"version": "3.0.2"
 }
