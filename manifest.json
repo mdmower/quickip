@@ -19,15 +19,15 @@
 	"commands": {
 		"quick-copy-ipv4": {
 			"suggested_key": {
-				"default": "Ctrl+Shift+U",
-				"mac": "Command+Shift+U"
+				"default": "Ctrl+Shift+4",
+				"mac": "Command+Shift+4"
 			},
 			"description": "Copy IPv4 to clipboard"
 		},
 		"quick-copy-ipv6": {
 			"suggested_key": {
-				"default": "Ctrl+Shift+Y",
-				"mac": "Command+Shift+Y"
+				"default": "Ctrl+Shift+6",
+				"mac": "Command+Shift+6"
 			},
 			"description": "Copy IPv6 to clipboard"
 		}
