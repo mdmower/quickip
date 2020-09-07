@@ -1,0 +1,57 @@
+{
+  "name": "quickip-chrome",
+  "version": "4.0.0",
+  "description": "An extension for Chrome to quickly find and copy your public IPv4 and IPv6 addresses",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src build",
+    "format": "prettier --write \"build/**/*.js\" \"src/**/*.ts\"",
+    "build": "node build/dist.js",
+    "build-debug": "node build/dist.js --debug",
+    "pkg": "node build/pkg.js",
+    "clean": "node build/clean.js",
+    "release": "npm run lint && npm run clean && npm run build && npm run pkg"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdmower/quickip-chrome.git"
+  },
+  "keywords": [
+    "ip",
+    "quickip",
+    "chrome",
+    "extension"
+  ],
+  "author": "Matthew D. Mower <mdmower@cmphys.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mdmower/quickip-chrome/issues"
+  },
+  "homepage": "https://github.com/mdmower/quickip-chrome#readme",
+  "dependencies": {
+    "is-ip": "^3.1.0",
+    "sortablejs": "^1.10.2"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.122",
+    "@types/html-minifier": "^4.0.0",
+    "@types/node": "^14.6.4",
+    "@types/sortablejs": "^1.10.6",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "archiver": "^5.0.0",
+    "clean-css": "^4.2.3",
+    "colors": "^1.4.0",
+    "eslint": "^7.8.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-jsdoc": "^30.3.3",
+    "eslint-plugin-prettier": "^3.1.4",
+    "fs-extra": "^9.0.1",
+    "html-minifier": "^4.0.0",
+    "minimist": "^1.2.5",
+    "prettier": "^2.1.1",
+    "ts-loader": "^8.0.3",
+    "typescript": "^4.0.2",
+    "webpack": "^4.44.1"
+  }
+}

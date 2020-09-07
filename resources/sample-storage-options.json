@@ -1,0 +1,38 @@
+{
+  "source_states_v4": {
+    "icanhazip": {
+      "enabled": true,
+      "order": 0
+    },
+    "identme": {
+      "enabled": true,
+      "order": 3
+    },
+    "ipify": {
+      "enabled": true,
+      "order": 2
+    },
+    "wtfismyip": {
+      "enabled": true,
+      "order": 1
+    }
+  },
+  "source_states_v6": {
+    "icanhazip": {
+      "enabled": true,
+      "order": 0
+    },
+    "identme": {
+      "enabled": true,
+      "order": 2
+    },
+    "wtfismyip": {
+      "enabled": true,
+      "order": 1
+    }
+  },
+  "version_states": {
+    "v4": true,
+    "v6": true
+  }
+}

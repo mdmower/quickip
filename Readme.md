@@ -1,14 +1,33 @@
-Quickly get your IPv4 and IPv6 addresses with this extension for Chrome.
+# quickip-chrome
 
-Install this extension from the [Chrome Web Store](https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn).  
+Quickly find your IPv4 and IPv6 addresses with this extension for Chrome, available from the [Chrome Web Store](https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn).
 
-**Features:**
+## Features
 
-1.  Select which resolvers should be used for each IP version
-2.  Select which IP version(s) should be reported
-3.  Copy your IP to the clipboard with a keyboard shortcut (configurable)
+1. Select which IP version(s) should be reported
+1. Select which resolvers should be used for each IP version
+1. Copy your IP to the clipboard with a keyboard shortcut (configurable)
 
-Languages supported: English
+## Build
 
-This is open source software, licensed under the Apache License, Version 2.0.  
-© 2018 Matthew D. Mower
+Clone git repository locally and then install npm packages
+
+```
+npm install
+```
+
+Available npm scripts:
+
+- `npm run lint` - Lint your changes using eslint
+- `npm run format` - Use Prettier to format your changes
+- `npm run build` - Build the extension; output to `dist/`
+- `npm run build-debug` - Build the extension without HTML/CSS minification and include source maps in transpiled JS; output to `dist/`
+- `npm run pkg` - Compress contents of `dist/` to a `.zip` file and output to `pkg/`
+- `npm run clean` - Clear out the contents of `dist/`
+- `npm run release` - Run lint, clean, build, and pkg scripts, in that order
+
+## License
+
+Apache License, Version 2.0
+
+Copyright 2018 Matthew D. Mower

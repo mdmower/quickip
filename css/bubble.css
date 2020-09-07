@@ -1,0 +1,54 @@
+/**
+ * @license Apache-2.0
+ */
+
+body {
+  font-size: 100%;
+  margin: 3px 4px;
+  padding: 0;
+  min-width: 190px;
+  overflow-x: hidden;
+}
+
+button {
+  border: 1px solid #aaa;
+  padding: 3px 10px;
+  background-color: #eee;
+  box-sizing: border-box;
+}
+
+.output {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.output:last-of-type {
+  margin-bottom: 0;
+}
+
+.output label {
+  order: 1;
+  flex: 1;
+  display: flex;
+  height: 24px;
+}
+
+.output label span {
+  order: 1;
+  text-align: center;
+  line-height: 24px;
+}
+
+.output label input {
+  order: 2;
+  text-align: center;
+  margin-left: 4px;
+  flex: 1;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.output button {
+  order: 2;
+  margin-left: 4px;
+}
