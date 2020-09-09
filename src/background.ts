@@ -68,7 +68,7 @@ class QipBackground {
           this.copyIpToClipboard(IpVersionIndex.V4);
           break;
         case 'quick-copy-ipv6':
-          this.copyIpToClipboard(IpVersionIndex.V4);
+          this.copyIpToClipboard(IpVersionIndex.V6);
           break;
         default:
           break;
