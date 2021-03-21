@@ -49,7 +49,8 @@ export default class QipActions {
       .then((response) => response.text())
       .then((ip) => {
         ip = ip.trim();
-        if (!isIp(ip)) {
+        const validIp = version === IpVersionIndex.V6 ? isIp.v6(ip) : isIp.v4(ip);
+        if (!validIp) {
           console.log(`requestIP: Invalid response from ${url}`);
           return this.requestIP(version, ids, attempt);
         }
