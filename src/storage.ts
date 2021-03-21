@@ -102,7 +102,7 @@ export default class QipStorage {
   async setOptions(options: {[key: string]: any}): Promise<void> {
     this.toggleChangeHandler(false);
     await new Promise((resolve) => {
-      chrome.storage.sync.set(options, resolve);
+      chrome.storage.sync.set(options, () => resolve(undefined));
     });
     this.toggleChangeHandler(true);
   }
@@ -113,7 +113,7 @@ export default class QipStorage {
   async clearOptions(): Promise<void> {
     this.toggleChangeHandler(false);
     await new Promise((resolve) => {
-      chrome.storage.sync.clear(resolve);
+      chrome.storage.sync.clear(() => resolve(undefined));
     });
     this.toggleChangeHandler(true);
   }

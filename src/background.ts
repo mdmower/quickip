@@ -19,7 +19,7 @@ document.addEventListener(
   'DOMContentLoaded',
   function () {
     const qipBackground = new QipBackground();
-    global.window.qipBackground = qipBackground;
+    window.qipBackground = qipBackground;
     qipBackground.init().catch((error) => {
       console.error('Init failed\n', error);
     });
