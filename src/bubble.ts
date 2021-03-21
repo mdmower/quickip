@@ -2,43 +2,53 @@
  * @license Apache-2.0
  */
 
+import {IpVersionIndex} from './interfaces';
 import {QipActions} from './actions';
 import {QipSources} from './sources';
+import {QipStorage} from './storage';
 
 document.addEventListener(
   'DOMContentLoaded',
   function () {
-    new QipBubble().init();
+    new QipBubble().init().catch((error) => {
+      console.error('Unexpected error during initialization', error);
+    });
   },
   false
 );
 
 class QipBubble {
+  /**
+   * IP sources handler
+   */
   private sources_: QipSources;
+
+  /**
+   * IP actions handler
+   */
   private actions_: QipActions;
 
   constructor() {
-    const {sources, actions} = chrome.extension.getBackgroundPage()?.qipBackground || {};
-    if (!sources || !actions) {
-      throw new Error('Background page is missing shared objects');
-    }
-    this.sources_ = sources;
-    this.actions_ = actions;
+    const storage = new QipStorage();
+    this.sources_ = new QipSources(storage);
+    this.actions_ = new QipActions(this.sources_);
   }
 
   /**
    * Initialize bubble
    */
-  init() {
+  public async init(): Promise<void> {
+    await this.sources_.init();
+    await this.actions_.init();
     this.initOutputs();
     this.startListeners();
-    this.insertIP();
+    this.insertEnabledIPs();
   }
 
   /**
    * Create elements from templates for bubble
    */
-  initOutputs() {
+  private initOutputs() {
     this.sources_.getVersions().forEach((version) => {
       const versionData = this.sources_.getVersionData(version);
       if (!versionData.enabled) {
@@ -77,7 +87,7 @@ class QipBubble {
   /**
    * Listen for 'Copy' button clicks
    */
-  startListeners() {
+  private startListeners() {
     Array.from(document.querySelectorAll('button')).forEach((button) => {
       button.addEventListener('click', this.copyIP.bind(this));
     });
@@ -87,16 +97,11 @@ class QipBubble {
    * For each enabled IP version, request an IP address and insert
    * it into the bubble output (<input readonly>)
    */
-  insertIP() {
+  private insertEnabledIPs() {
     this.sources_.getVersions().forEach((version) => {
       const versionData = this.sources_.getVersionData(version);
       if (!versionData.enabled) {
         return;
-      }
-
-      let ids = this.sources_.getOrderedEnabledSourceIds(version);
-      if (!ids.length) {
-        ids = [this.sources_.getDefaultSourceId(version)];
       }
 
       const input = document.querySelector<HTMLInputElement>(`input[data-version="${version}"]`);
@@ -104,27 +109,36 @@ class QipBubble {
         return;
       }
 
-      this.actions_
-        .requestIP(version, ids, 0)
-        .then((ip) => {
-          input.value = ip;
-          if (version === 'v6') {
-            input.setAttribute('size', '39');
-          }
-        })
-        .catch((error) => {
-          console.log(`insertIP (version ${version}): Unable to complete request\n`, error);
-          input.value = '';
-          input.placeholder = 'Not Found';
-        });
+      this.insertIP(version, input).catch((error) => {
+        console.error(`Failed to find and output IP${version}`, error);
+      });
     });
+  }
+
+  /**
+   * Request an IP address for the given version and insert it into the
+   * specified input element
+   * @param version IP version
+   * @param input IP output element
+   */
+  private async insertIP(version: IpVersionIndex, input: HTMLInputElement): Promise<void> {
+    const ip = await this.actions_.getIP(version);
+    if (ip) {
+      input.value = ip;
+      if (version === 'v6') {
+        input.setAttribute('size', '39');
+      }
+    } else {
+      input.value = '';
+      input.placeholder = 'Not Found';
+    }
   }
 
   /**
    * Handle 'Copy' button clicks to write an IP to the clipboard
    * @param event Mouse click event
    */
-  copyIP(event: MouseEvent) {
+  private copyIP(event: MouseEvent) {
     const button = event.currentTarget as HTMLButtonElement | null;
     if (!button) {
       return;
@@ -141,27 +155,26 @@ class QipBubble {
     }
 
     const inputValue = input.value;
-    if (inputValue) {
-      console.log(`copyIP: Contents: "${inputValue}"`);
-      navigator.clipboard.writeText(inputValue).catch((error) => {
-        console.log(
-          'navigator.clipboard.writeText did not succeed; using fallback method\n',
-          error
-        );
-        document.oncopy = function (event) {
-          if (event.clipboardData) {
-            event.clipboardData.setData('text/plain', input.value);
-            event.preventDefault();
-          }
-        };
-        document.execCommand('copy', false, undefined);
-      });
-
-      // User feedback
-      input.style.color = 'blue';
-      setTimeout(() => {
-        input.style.removeProperty('color');
-      }, 300);
+    if (!inputValue) {
+      return;
     }
+
+    console.log(`copyIP: Contents: "${inputValue}"`);
+    navigator.clipboard.writeText(inputValue).catch((error) => {
+      console.log('navigator.clipboard.writeText did not succeed; using fallback method\n', error);
+      document.oncopy = function (event) {
+        if (event.clipboardData) {
+          event.clipboardData.setData('text/plain', input.value);
+          event.preventDefault();
+        }
+      };
+      document.execCommand('copy', false, undefined);
+    });
+
+    // User feedback
+    input.style.color = 'blue';
+    setTimeout(() => {
+      input.style.removeProperty('color');
+    }, 300);
   }
 }

@@ -24,13 +24,6 @@ export enum StorageSourceStatesIndex {
 export const VersionStatesIndex = 'version_states';
 
 /**
- * Message passing
- */
-export interface InternalMessage {
-  cmd: string;
-}
-
-/**
  * Information about an individual source
  */
 export interface IndividualSource {

@@ -19,35 +19,55 @@ import {
 import {QipStorage} from './storage';
 import {assertObject, getTypedKeys, isObject} from './utils';
 
-export default class QipSources {
-  private inited_: boolean;
-  private data_: SourceData;
+/**
+ * IP sources handling
+ */
+class QipSources {
+  /**
+   * Storage handler
+   */
   private storage_: QipStorage;
 
+  /**
+   * IP sources data
+   */
+  private data_: SourceData = getDefaultSourcesData();
+
+  /**
+   * Whether sources have been initialized
+   */
+  private initialized_: boolean = false;
+
+  /**
+   * @param storage Storage handler
+   */
   constructor(storage: QipStorage) {
-    this.inited_ = false;
-    this.data_ = getDefaultSourcesData();
     this.storage_ = storage;
   }
 
   /**
    * Initialize (if necessary) source data
    */
-  async init(): Promise<void> {
-    if (this.inited_) {
+  public async init(): Promise<void> {
+    if (this.initialized_) {
       return;
     }
-    this.inited_ = true;
-    this.storage_.storageChangeSourcesHook = this.applySourceOptions.bind(this);
+    this.initialized_ = true;
 
-    await this.applySourceOptions();
+    await this.storage_.init();
+    this.storage_.addStorageChangeCallback(this.applySourceOptions.bind(this));
+    return this.applySourceOptions();
   }
 
   /**
    * Get the IP version ID that should be automatically enabled if the user attempts to un-select
    * all versions in Options
    */
-  getDefaultVersion(): IpVersionIndex {
+  public getDefaultVersion(): IpVersionIndex {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     return (
       getTypedKeys(this.data_).find((version) => {
         return this.data_[version].default;
@@ -58,7 +78,11 @@ export default class QipSources {
   /**
    * Get an array of all known IP version IDs
    */
-  getVersions(): IpVersionIndex[] {
+  public getVersions(): IpVersionIndex[] {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     return getTypedKeys(this.data_);
   }
 
@@ -66,10 +90,14 @@ export default class QipSources {
    * Get all data for a specific IP version
    * @param version IP version
    */
-  getVersionData(version?: IpVersionIndex): IPvxSourceData {
+  public getVersionData(version?: IpVersionIndex): IPvxSourceData {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
     if (!version || !this.getVersions().includes(version)) {
       throw new Error(`Unrecognized IP version "${version || ''}"`);
     }
+
     return this.data_[version];
   }
 
@@ -77,7 +105,11 @@ export default class QipSources {
    * Get info for all sources under a specific IP version
    * @param version IP version
    */
-  getSources(version: IpVersionIndex): {[key: string]: IndividualSource} {
+  public getSources(version: IpVersionIndex): {[key: string]: IndividualSource} {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     const sources = this.getVersionData(version).sources;
     return Object.keys(sources).reduce((verifiedSources, id) => {
       const sourceData = sources[id];
@@ -93,7 +125,11 @@ export default class QipSources {
    * @param version IP version
    * @param id Source ID
    */
-  getSourceData(version: IpVersionIndex, id: string): IndividualSource {
+  public getSourceData(version: IpVersionIndex, id: string): IndividualSource {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     const sources = this.getSources(version);
     if (!id) {
       throw new Error(`Missing source ID "${id}" for IP version "${version}"`);
@@ -110,7 +146,11 @@ export default class QipSources {
    * un-select all sources for a specific IP version in Options
    * @param version IP version
    */
-  getDefaultSourceId(version: IpVersionIndex): string {
+  public getDefaultSourceId(version: IpVersionIndex): string {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     const sources = this.getSources(version);
     return (
       Object.keys(sources).find((id) => {
@@ -123,7 +163,11 @@ export default class QipSources {
    * Get an array of all known source IDs for a specific IP version
    * @param version IP version
    */
-  getSourceIds(version: IpVersionIndex): string[] {
+  public getSourceIds(version: IpVersionIndex): string[] {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     const sources = this.getSources(version);
     return Object.keys(sources);
   }
@@ -132,7 +176,11 @@ export default class QipSources {
    * Get an array of all known source IDs for a specific IP version sorted by user preference
    * @param version IP version
    */
-  getOrderedSourceIds(version: IpVersionIndex): string[] {
+  public getOrderedSourceIds(version: IpVersionIndex): string[] {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     const sources = this.getSources(version);
     return Object.keys(sources).sort((a, b) => sources[a].order - sources[b].order);
   }
@@ -141,7 +189,11 @@ export default class QipSources {
    * Get an array of all enabled source IDs for a specific IP version
    * @param version IP version
    */
-  getEnabledSourceIds(version: IpVersionIndex): string[] {
+  public getEnabledSourceIds(version: IpVersionIndex): string[] {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     const sources = this.getSources(version);
     return Object.keys(sources).filter((id) => sources[id].enabled);
   }
@@ -150,7 +202,11 @@ export default class QipSources {
    * Get an array of all enabled source IDs for a specific IP version sorted by user preference
    * @param version IP version
    */
-  getOrderedEnabledSourceIds(version: IpVersionIndex): string[] {
+  public getOrderedEnabledSourceIds(version: IpVersionIndex): string[] {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     const sources = this.getSources(version);
     return Object.keys(sources)
       .filter((id) => sources[id].enabled)
@@ -161,7 +217,11 @@ export default class QipSources {
    * Restore original source data
    * @param version IP version
    */
-  restoreData(version?: IpVersionIndex): void {
+  public restoreData(version?: IpVersionIndex): void {
+    if (!this.initialized_) {
+      throw new Error('Sources have not yet been initialized');
+    }
+
     if (version !== undefined) {
       this.data_[version] = getDefaultSourcesDataForVersion(version);
     } else {
@@ -177,9 +237,9 @@ export default class QipSources {
    * storage and the expected schema of the incoming options parameter. For now, this is the
    * smallest and quickest way to perform data validation. Libraries like superstruct and joi
    * could simplify this, but only at the expense of adding several hundred KB to this package's
-   * final size (which is ~40 KB at time of writing).
+   * final size.
    */
-  async applySourceOptions(): Promise<void> {
+  public async applySourceOptions(): Promise<void> {
     let unverifiedOpts = await this.storage_.getOptions();
     if (!isObject(unverifiedOpts) || Object.keys(unverifiedOpts).length === 0) {
       unverifiedOpts = getDefaultStorageData();

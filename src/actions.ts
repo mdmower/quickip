@@ -1,65 +1,84 @@
 import {isIPv4, isIPv6} from 'is-ip';
-
 import {IpVersionIndex} from './interfaces';
 import {QipSources} from './sources';
 
-export default class QipActions {
-  private inited_: boolean;
+/**
+ * IP actions handling
+ */
+class QipActions {
+  /**
+   * IP sources handler
+   */
   private sources_: QipSources;
 
+  /**
+   * Whether actions have been initialized
+   */
+  private initialized_: boolean = false;
+
+  /**
+   * @param sources IP sources handler
+   */
   constructor(sources: QipSources) {
-    this.inited_ = false;
     this.sources_ = sources;
   }
 
   /**
    * Initialize (if necessary) actions
    */
-  async init(): Promise<void> {
-    if (this.inited_) {
+  public async init(): Promise<void> {
+    if (this.initialized_) {
       return;
     }
-    this.inited_ = true;
+    this.initialized_ = true;
 
-    return Promise.resolve();
+    return this.sources_.init();
   }
 
   /**
-   * Fetch an IP, cycling through ordered sources whenever a request fails until all enabled sources
-   * are exhausted
+   * Fetch IP, cycling through the provided sources until a valid response is found
    * @param version IP version
    * @param ids Source IDs
-   * @param attempt Zero-indexed attempt number
    */
-  async requestIP(version: IpVersionIndex, ids: string[], attempt: number): Promise<string> {
-    if (attempt >= ids.length) {
-      throw new Error(
-        `requestIP: Attempt #${attempt} exceeds number of enabled sources; network down?`
-      );
+  private async getIpFromSources(
+    version: IpVersionIndex,
+    ids: string[]
+  ): Promise<string | undefined> {
+    const urls = ids.map((id) => this.sources_.getSourceData(version, id).url);
+
+    for (let i = 0; i < ids.length; i++) {
+      const url = urls[i];
+      console.log(`requestIP: Checking source ${url}`);
+
+      try {
+        const response = await fetch(url, {cache: 'no-store'});
+        const ip = (await response.text()).trim();
+        const validIp = version === IpVersionIndex.V6 ? isIPv6(ip) : isIPv4(ip);
+        if (validIp) {
+          return ip;
+        }
+        console.warn(`getIpFromSources: Invalid response from ${url}`);
+      } catch (ex) {
+        console.warn(`getIpFromSources: Request failed for ${url}\n`, ex);
+      }
     }
 
-    const urls = ids.map((id) => this.sources_.getSourceData(version, id).url);
-    const url = urls[attempt];
-    console.log(`requestIP: Checking source ${url}`);
+    console.error(
+      `getIpFromSources: Attempt #${ids.length} exceeds number of enabled sources; network down?`
+    );
+  }
 
-    // Prepare for next iteration, if necessary
-    attempt += 1;
+  /**
+   * Fetch an IP, cycling through sources enabled by the user until a valid response is found
+   * @param version IP version
+   */
+  public async getIP(version: IpVersionIndex): Promise<string | undefined> {
+    let ids = this.sources_.getOrderedEnabledSourceIds(version);
+    if (!ids.length) {
+      ids = [this.sources_.getDefaultSourceId(version)];
+    }
 
-    return fetch(url, {cache: 'no-store'})
-      .then((response) => response.text())
-      .then((ip) => {
-        ip = ip.trim();
-        const validIp = version === IpVersionIndex.V6 ? isIPv6(ip) : isIPv4(ip);
-        if (!validIp) {
-          console.log(`requestIP: Invalid response from ${url}`);
-          return this.requestIP(version, ids, attempt);
-        }
-        return ip;
-      })
-      .catch((error) => {
-        console.log(`requestIP: Request failed for ${url}\n`, error);
-        return this.requestIP(version, ids, attempt);
-      });
+    return this.getIpFromSources(version, ids);
   }
 }
 

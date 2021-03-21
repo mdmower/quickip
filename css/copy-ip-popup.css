@@ -1,0 +1,14 @@
+/**
+ * @license Apache-2.0
+ */
+
+body {
+  font-size: 100%;
+  text-align: center;
+  overflow: hidden;
+}
+
+#output,
+#error-msg {
+  display: none;
+}
