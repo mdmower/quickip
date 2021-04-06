@@ -83,6 +83,14 @@ const defaultSources: SourceData = {
         default: false,
         enabled: true,
       },
+      ipify: {
+        id: 'ipify',
+        url: 'https://api6.ipify.org',
+        name: 'ipify',
+        order: 3,
+        default: false,
+        enabled: true,
+      },
     },
   },
 };
