@@ -1,6 +1,6 @@
 # quickip-chrome
 
-Quickly find your IPv4 and IPv6 addresses with this extension for Chrome, available from the [Chrome Web Store](https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn).
+Quickly find your IPv4 and IPv6 addresses. Available from the [Chrome Web Store](https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn) for Google Chrome and [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/quickip/dlkccijfhgebpigilcjllgbaiedopifj) for Microsoft Edge.
 
 ## Features
 
