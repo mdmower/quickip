@@ -82,6 +82,7 @@ class QipOptions {
    */
   init(): void {
     this.initAboutVersion();
+    this.initWebStoreLink();
     this.initSourceLists();
     this.initVersionOptions();
     this.sortifyList();
@@ -218,6 +219,34 @@ class QipOptions {
     const extensionVersion = document.querySelector<HTMLSpanElement>('#extensionVersion');
     if (extensionVersion) {
       extensionVersion.textContent = chrome.runtime.getManifest().version;
+    }
+  }
+
+  /**
+   * Add link to relevant web store
+   */
+  initWebStoreLink(): void {
+    const webStoreLink = document.querySelector<HTMLSpanElement>('#webStoreLink');
+    if (webStoreLink) {
+      let url;
+      let text;
+      const extensionId = chrome.runtime.id;
+      if (extensionId === 'fminocopafmpcihgnilcacgjpcppacfn') {
+        url = 'https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn';
+        text = 'Chrome Web Store';
+      } else if (extensionId === 'dlkccijfhgebpigilcjllgbaiedopifj') {
+        url =
+          'https://microsoftedge.microsoft.com/addons/detail/quickip/dlkccijfhgebpigilcjllgbaiedopifj';
+        text = 'Edge Add-ons';
+      }
+
+      if (url && text) {
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.textContent = text;
+        webStoreLink.textContent = ' / ';
+        webStoreLink.appendChild(anchor);
+      }
     }
   }
 
