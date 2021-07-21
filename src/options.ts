@@ -366,7 +366,7 @@ class QipOptions {
    */
   openShortcutsConfig(event: Event): void {
     event.preventDefault();
-    chrome.tabs.create({url: 'chrome://extensions/shortcuts'});
+    chrome.tabs.create({url: 'chrome://extensions/shortcuts'}, undefined);
   }
 
   /**
