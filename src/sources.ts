@@ -17,7 +17,7 @@ import {
   getIpVersionFromSSSI,
 } from './interfaces';
 import {QipStorage} from './storage';
-import {getTypedKeys, isObject} from './utils';
+import {assertObject, getTypedKeys, isObject} from './utils';
 
 export default class QipSources {
   private inited_: boolean;
@@ -185,7 +185,7 @@ export default class QipSources {
       unverifiedOpts = getDefaultStorageData();
       await this.storage_.setOptions(unverifiedOpts);
     }
-    const opts = <{[key: string]: any}>unverifiedOpts;
+    const opts = unverifiedOpts;
 
     // Use default storage data as a reliable tree that can be crawled
     // and look for corresponding properties in the unverified options.
@@ -196,10 +196,13 @@ export default class QipSources {
         // default options.
         opts[name] = storageData[name];
       }
-      if (!isObject(opts[name])) {
+
+      let opt: Record<string, unknown>;
+      try {
+        opt = assertObject(opts[name]);
+      } catch (ex) {
         return;
       }
-      const opt = <{[key: string]: any}>opts[name];
 
       if (name === VersionStatesIndex) {
         const storageVersionStates = storageData[name];
@@ -222,10 +225,12 @@ export default class QipSources {
             return;
           }
 
-          if (!isObject(opt[id])) {
+          let optSourceState: Record<string, unknown>;
+          try {
+            optSourceState = assertObject(opt[id]);
+          } catch (ex) {
             return;
           }
-          const optSourceState = <{[key: string]: any}>opt[id];
 
           const optSourceStateEnabled = optSourceState.enabled;
           if (typeof optSourceStateEnabled === 'boolean') {

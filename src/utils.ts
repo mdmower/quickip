@@ -7,6 +7,17 @@ export function isObject(obj: unknown): boolean {
 }
 
 /**
+ * Assert variable is an object or throw
+ * @param obj Candidate object
+ */
+export function assertObject(obj: unknown): Record<string, unknown> {
+  if (isObject(obj)) {
+    return <Record<string, unknown>>obj;
+  }
+  throw new Error('Not an object');
+}
+
+/**
  * Get typed object keys
  * @param obj Object with known key types
  */

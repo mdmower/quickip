@@ -71,7 +71,7 @@ export default class QipStorage {
    * Get the value of a stored option
    * @param option Option name
    */
-  async getOption(option: string): Promise<any> {
+  async getOption(option: string): Promise<unknown> {
     return this.getOptions([option]).then((stg) => stg[option]);
   }
 
@@ -79,7 +79,7 @@ export default class QipStorage {
    * Get the values of multiple stored options
    * @param options Option names
    */
-  async getOptions(options?: string[]): Promise<{[key: string]: any}> {
+  async getOptions(options?: string[]): Promise<Record<string, unknown>> {
     return new Promise((resolve) => {
       chrome.storage.sync.get(options || null, resolve);
     });
@@ -99,7 +99,7 @@ export default class QipStorage {
    * Set the value of multiple options in storage
    * @param options Option name/value pairs
    */
-  async setOptions(options: {[key: string]: any}): Promise<void> {
+  async setOptions(options: Record<string, unknown>): Promise<void> {
     this.toggleChangeHandler(false);
     await new Promise((resolve) => {
       chrome.storage.sync.set(options, () => resolve(undefined));
