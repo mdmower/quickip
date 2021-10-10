@@ -1,10 +1,9 @@
 /**
- * Test whether a variable is an object
- * @param obj Candidate
+ * Determine whether a variable is an object (excluding functions, arrays, and null)
+ * @param obj Candidate object
  */
-export function isObject(obj: any): boolean {
-  const type = typeof obj;
-  return (type === 'function' || type === 'object') && Boolean(obj);
+export function isObject(obj: unknown): boolean {
+  return typeof obj === 'object' && !!obj && !Array.isArray(obj);
 }
 
 /**
