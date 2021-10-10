@@ -87,10 +87,9 @@ export interface StorageSourceStates {
  */
 export type StorageData = {
   [name in typeof VersionStatesIndex]: StorageVersionStates;
-} &
-  {
-    [name in StorageSourceStatesIndex]: StorageSourceStates;
-  };
+} & {
+  [name in StorageSourceStatesIndex]: StorageSourceStates;
+};
 
 /**
  * Get all supported IP versions
