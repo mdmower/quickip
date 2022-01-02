@@ -1,4 +1,4 @@
-import isIp from 'is-ip';
+import {isIPv4, isIPv6} from 'is-ip';
 
 import {IpVersionIndex} from './interfaces';
 import {QipSources} from './sources';
@@ -49,7 +49,7 @@ export default class QipActions {
       .then((response) => response.text())
       .then((ip) => {
         ip = ip.trim();
-        const validIp = version === IpVersionIndex.V6 ? isIp.v6(ip) : isIp.v4(ip);
+        const validIp = version === IpVersionIndex.V6 ? isIPv6(ip) : isIPv4(ip);
         if (!validIp) {
           console.log(`requestIP: Invalid response from ${url}`);
           return this.requestIP(version, ids, attempt);
