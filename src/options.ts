@@ -342,22 +342,33 @@ class QipOptions {
   }
 
   /**
-   * Enable all sources for a specific IP version
+   * Handler for enableAllSourcesAsync
    * @param event Event that triggered this handler
    */
-  async enableAllSources(event: Event): Promise<void> {
+  enableAllSources(event: Event): void {
     const target = event.currentTarget as HTMLButtonElement | null;
     if (!target) {
       return;
     }
-    const version = target.getAttribute('data-version') || '';
+
+    this.enableAllSourcesAsync(target).catch((error) => {
+      console.warn('Unable to enable all sources', error);
+    });
+  }
+
+  /**
+   * Enable all sources for a specific IP version
+   * @param button Button that triggered this handler
+   */
+  async enableAllSourcesAsync(button: HTMLButtonElement): Promise<void> {
+    const version = button.getAttribute('data-version') || '';
     const inputs = document.querySelectorAll<HTMLInputElement>(
       '#sources-container input[data-version="' + version + '"]'
     );
     inputs.forEach((input) => {
       input.checked = true;
     });
-    return this.saveOptions();
+    await this.saveOptionsAsync();
   }
 
   /**
@@ -370,9 +381,18 @@ class QipOptions {
   }
 
   /**
+   * Handler for restoreDefaults
+   */
+  restoreDefaults(): void {
+    this.restoreDefaultsAsync().catch((error) => {
+      console.warn('Unable to restore defaults', error);
+    });
+  }
+
+  /**
    * Restore all settings to defaults
    */
-  async restoreDefaults(): Promise<void> {
+  async restoreDefaultsAsync(): Promise<void> {
     await this.storage_.clearOptions();
     await this.storage_.setOptions(getDefaultStorageData());
     await this.sources_.applySourceOptions();
@@ -380,9 +400,18 @@ class QipOptions {
   }
 
   /**
+   * Handler for saveOptionsAsync
+   */
+  saveOptions(): void {
+    this.saveOptionsAsync().catch((error) => {
+      console.warn('Unable to save options', error);
+    });
+  }
+
+  /**
    * Save all options to storage
    */
-  async saveOptions(): Promise<void> {
+  async saveOptionsAsync(): Promise<void> {
     const options = {} as StorageData;
     let errorMessage = '';
 
