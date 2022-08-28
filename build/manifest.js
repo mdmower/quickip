@@ -56,6 +56,8 @@ module.exports = {
     'https://*.ident.me/',
     'https://*.icanhazip.com/',
     'https://*.wtfismyip.com/',
+    'https://*.ipinfo.io/',
+    'https://*.seeip.org/',
   ],
   version: packageJson.version,
 };
