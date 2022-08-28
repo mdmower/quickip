@@ -53,9 +53,12 @@ export default class QipStorage {
         console.error('Failed to apply sources update from storage sync\n', error);
       })
       .finally(() => {
-        chrome.runtime.sendMessage(<InternalMessage>{
-          cmd: 'settings_updated',
-        });
+        chrome.runtime.sendMessage(
+          <InternalMessage>{
+            cmd: 'settings_updated',
+          },
+          () => undefined
+        );
       });
   }
 
