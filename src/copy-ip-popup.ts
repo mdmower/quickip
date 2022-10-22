@@ -24,9 +24,9 @@ class QipCopyIpPopup {
   private actions_: QipActions;
 
   /**
-   * Number of seconds to display an error message before closing window
+   * Number of milliseconds to display an error message before closing window
    */
-  private errorDisplayTime_: number = 2;
+  private errorDisplayTime_: number = 2000;
 
   constructor() {
     const storage = new QipStorage();
@@ -115,12 +115,14 @@ class QipCopyIpPopup {
     outputNode.style.display = 'block';
 
     await this.copyIP(ip);
-    return this.closePopup();
+    // Issue 1377703: navigator.clipboard.writeText resolves too early
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1377703
+    return this.closePopup(10);
   }
 
   /**
    * Close popup window
-   * @param delay Delay in seconds before popup should be closed
+   * @param delay Delay in milliseconds before popup should be closed
    */
   private async closePopup(delay?: number): Promise<void> {
     if (!delay || delay < 0) {
@@ -135,7 +137,7 @@ class QipCopyIpPopup {
           clearInterval(interval);
           resolve(undefined);
         }
-      }, delay * 1000);
+      }, delay);
     });
 
     window.close();
