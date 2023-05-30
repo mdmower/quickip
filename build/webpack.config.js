@@ -6,7 +6,7 @@ module.exports = {
     bubble: path.resolve(__dirname, '..', 'src', 'pages', 'bubble.ts'),
     options: path.resolve(__dirname, '..', 'src', 'pages', 'options.ts'),
     sw: path.resolve(__dirname, '..', 'src', 'sw.ts'),
-    'copy-ip-popup': path.resolve(__dirname, '..', 'src', 'pages', 'copy-ip-popup.ts'),
+    offscreen: path.resolve(__dirname, '..', 'src', 'pages', 'offscreen.ts'),
   },
   module: {
     rules: [

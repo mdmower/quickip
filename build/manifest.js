@@ -49,7 +49,7 @@ module.exports = {
   manifest_version: 3,
   name: 'QuickIP',
   options_page: 'options.html',
-  permissions: ['clipboardWrite', 'storage'],
+  permissions: ['clipboardWrite', 'offscreen', 'storage'],
   host_permissions: [
     'https://*.ipify.org/',
     'https://*.ident.me/',

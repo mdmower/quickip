@@ -1,17 +1,34 @@
+import {getIp} from './actions';
 import {IpVersionIndex} from './interfaces';
 import {logError} from './logger';
+import {
+  MessageCmd,
+  OffscreenAction,
+  OffscreenDocMessage,
+  sendInternalMessageAsync,
+} from './messaging';
 
 /**
  * Handle shortcut command events
  * @param command Command ID
  */
 export function handleCommand(command: string): void {
+  asyncHandleCommand(command).catch((error) => {
+    logError('Failed to handle command', error);
+  });
+}
+
+/**
+ * Async handler for shortcut command events
+ * @param command Command ID
+ */
+export async function asyncHandleCommand(command: string): Promise<void> {
   switch (command) {
     case 'quick-copy-ipv4':
-      openCopyIpWindow(IpVersionIndex.V4);
+      await copyIpOffscreen(IpVersionIndex.V4);
       break;
     case 'quick-copy-ipv6':
-      openCopyIpWindow(IpVersionIndex.V6);
+      await copyIpOffscreen(IpVersionIndex.V6);
       break;
     default:
       break;
@@ -19,20 +36,38 @@ export function handleCommand(command: string): void {
 }
 
 /**
- * Open a new popup window so that we have a DOM available
- * to copy an IP address to the clipboard.
+ * Find IP address and copy to clipboard in an offscreen document
  * @param version IP version
  */
-function openCopyIpWindow(version: IpVersionIndex): void {
-  chrome.windows
-    .create({
-      url: 'copy-ip-popup.html?ip_version=' + encodeURIComponent(version),
-      focused: true,
-      height: 60,
-      width: 400,
-      type: 'popup',
-    })
-    .catch((error) => {
-      logError('Failed to open CopyIP window\n', error);
+async function copyIpOffscreen(version: IpVersionIndex): Promise<void> {
+  // If IP could not be found, copy an empty string to the clipboard as an
+  // indication that the command fired successfully.
+  const ip = (await getIp(version)) ?? '';
+
+  await chrome.offscreen.createDocument({
+    justification: 'Shortcut command should copy an IP address to the clipboard',
+    reasons: [chrome.offscreen.Reason.CLIPBOARD],
+    url: 'offscreen.html',
+  });
+
+  try {
+    const messageResponse = await sendInternalMessageAsync<
+      OffscreenDocMessage<string>,
+      OffscreenDocMessage<string>
+    >({
+      cmd: MessageCmd.OffscreenDoc,
+      data: {
+        action: OffscreenAction.CopyIp,
+        data: ip,
+      },
     });
+
+    if (messageResponse?.data?.data === undefined) {
+      logError('Offscreen document did not complete copy IP procedure');
+    }
+  } catch (ex) {
+    logError('Failed to communicate with offscreen document', ex);
+  } finally {
+    await chrome.offscreen.closeDocument();
+  }
 }
