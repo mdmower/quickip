@@ -17,7 +17,7 @@ import {
   getIpVersionFromSSSI,
 } from './interfaces';
 import {QipStorage} from './storage';
-import {assertObject, getTypedKeys, isObject} from './utils';
+import {getTypedKeys, isRecord} from './utils';
 
 /**
  * IP sources handling
@@ -241,7 +241,7 @@ class QipSources {
    */
   public async applySourceOptions(): Promise<void> {
     let unverifiedOpts = await this.storage_.getOptions();
-    if (!isObject(unverifiedOpts) || Object.keys(unverifiedOpts).length === 0) {
+    if (!isRecord(unverifiedOpts) || Object.keys(unverifiedOpts).length === 0) {
       unverifiedOpts = getDefaultStorageData();
       await this.storage_.setOptions(unverifiedOpts);
     }
@@ -257,10 +257,8 @@ class QipSources {
         opts[name] = storageData[name];
       }
 
-      let opt: Record<string, unknown>;
-      try {
-        opt = assertObject(opts[name]);
-      } catch (ex) {
+      const opt = opts[name];
+      if (!isRecord(opt)) {
         return;
       }
 
@@ -285,10 +283,8 @@ class QipSources {
             return;
           }
 
-          let optSourceState: Record<string, unknown>;
-          try {
-            optSourceState = assertObject(opt[id]);
-          } catch (ex) {
+          const optSourceState = opt[id];
+          if (!isRecord(optSourceState)) {
             return;
           }
 

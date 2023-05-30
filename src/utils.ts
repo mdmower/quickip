@@ -1,20 +1,9 @@
 /**
- * Determine whether a variable is an object (excluding functions, arrays, and null)
- * @param obj Candidate object
+ * Determine whether a variable is a record-type object (excluding functions, arrays, and null)
+ * @param val Candidate value
  */
-export function isObject(obj: unknown): boolean {
-  return typeof obj === 'object' && !!obj && !Array.isArray(obj);
-}
-
-/**
- * Assert variable is an object or throw
- * @param obj Candidate object
- */
-export function assertObject(obj: unknown): Record<string, unknown> {
-  if (isObject(obj)) {
-    return <Record<string, unknown>>obj;
-  }
-  throw new Error('Not an object');
+export function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === 'object' && !!val && !Array.isArray(val);
 }
 
 /**
