@@ -2,16 +2,15 @@
  * @license Apache-2.0
  */
 
+import {getIp} from '../actions';
 import {IpVersionIndex} from '../interfaces';
-import {QipActions} from '../actions';
-import {QipStorage} from '../storage';
-import {QipSources} from '../sources';
+import {logError, logInfo} from '../logger';
 
 document.addEventListener(
   'DOMContentLoaded',
   function () {
     new QipCopyIpPopup().init().catch((error) => {
-      console.error('Unexpected error during initialization', error);
+      logError('Unexpected error during initialization', error);
     });
   },
   false
@@ -19,33 +18,20 @@ document.addEventListener(
 
 class QipCopyIpPopup {
   /**
-   * IP actions handler
-   */
-  private actions_: QipActions;
-
-  /**
    * Number of milliseconds to display an error message before closing window
    */
   private errorDisplayTime_: number = 2000;
-
-  constructor() {
-    const storage = new QipStorage();
-    const sources = new QipSources(storage);
-    this.actions_ = new QipActions(sources);
-  }
 
   /**
    * Initialize popup
    */
   public async init(): Promise<void> {
-    await this.actions_.init();
-
     const version = this.getVersion();
     if (version) {
       try {
         return this.insertIP(version);
       } catch (ex) {
-        console.error('Failed to fetch and copy IP\n', ex);
+        logError('Failed to fetch and copy IP\n', ex);
         window.close();
       }
     } else {
@@ -53,7 +39,7 @@ class QipCopyIpPopup {
       try {
         return this.closePopup(this.errorDisplayTime_);
       } catch (ex) {
-        console.error('Delayed close failed\n', ex);
+        logError('Delayed close failed\n', ex);
         window.close();
       }
     }
@@ -79,7 +65,7 @@ class QipCopyIpPopup {
     const outputNode = document.querySelector<HTMLDivElement>('#output');
     const errorMsgNode = document.querySelector<HTMLDivElement>('#error-msg');
     if (!searchingMsgNode || !outputNode || !errorMsgNode) {
-      console.error('showError: Unexpected popup HTML');
+      logError('showError: Unexpected popup HTML');
       return;
     }
 
@@ -100,11 +86,11 @@ class QipCopyIpPopup {
     const ipOutputNode = document.querySelector<HTMLSpanElement>('#ip-output');
     const errorMsgNode = document.querySelector<HTMLDivElement>('#error-msg');
     if (!searchingMsgNode || !outputNode || !ipOutputNode || !errorMsgNode) {
-      console.error('insertIP: Unexpected popup HTML');
+      logError('insertIP: Unexpected popup HTML');
       return this.closePopup();
     }
 
-    const ip = await this.actions_.getIP(version);
+    const ip = await getIp(version);
     if (!ip) {
       this.showError(`Could not find IP${version} address`);
       return this.closePopup(this.errorDisplayTime_);
@@ -152,16 +138,9 @@ class QipCopyIpPopup {
       return;
     }
 
-    console.log(`copyIP: Contents: "${ip}"`);
+    logInfo(`copyIP: Contents: "${ip}"`);
     return navigator.clipboard.writeText(ip).catch((error) => {
-      console.log('navigator.clipboard.writeText did not succeed; using fallback method\n', error);
-      document.oncopy = function (event) {
-        if (event.clipboardData) {
-          event.clipboardData.setData('text/plain', ip);
-          event.preventDefault();
-        }
-      };
-      document.execCommand('copy', false, undefined);
+      logError('Failed to copy IP to clipboard', error);
     });
   }
 }

@@ -1,3 +1,5 @@
+import {IpVersionIndex, StorageSourceStatesIndex} from './interfaces';
+
 /**
  * Determine whether a variable is a record-type object (excluding functions, arrays, and null)
  * @param val Candidate value
@@ -12,4 +14,47 @@ export function isRecord(val: unknown): val is Record<string, unknown> {
  */
 export function getTypedKeys<T extends object>(obj: T): Array<keyof T> {
   return Object.keys(obj) as Array<keyof typeof obj>;
+}
+
+/**
+ * Get typed IP version from string
+ * @param version IP version string (v4 or v6)
+ */
+export function getIpVersion(version: string): IpVersionIndex {
+  if (version === IpVersionIndex.V4 || version === IpVersionIndex.V6) {
+    return version;
+  }
+  throw new Error(`Could not identify IP version index from string "${version}"`);
+}
+
+/**
+ * Get IP version corresponding to a storage sources state index
+ * @param sssi Storage sources state index
+ */
+export function getIpVersionFromSSSI(sssi: StorageSourceStatesIndex): IpVersionIndex {
+  if (sssi === StorageSourceStatesIndex.V4) {
+    return IpVersionIndex.V4;
+  }
+  if (sssi === StorageSourceStatesIndex.V6) {
+    return IpVersionIndex.V6;
+  }
+  throw new Error(
+    `Could not identify IP version index from StorageSourceStatesIndex "${String(sssi)}"`
+  );
+}
+
+/**
+ * Get storage sources state index corresponding to an IP version
+ * @param version IP version
+ */
+export function getStorageSourceStatesIndex(version: IpVersionIndex): StorageSourceStatesIndex {
+  if (version === IpVersionIndex.V4) {
+    return StorageSourceStatesIndex.V4;
+  }
+  if (version === IpVersionIndex.V6) {
+    return StorageSourceStatesIndex.V6;
+  }
+  throw new Error(
+    `Could not identify storage source states key from IP version "${String(version)}"`
+  );
 }

@@ -1,4 +1,5 @@
 import {IpVersionIndex} from './interfaces';
+import {logError} from './logger';
 
 /**
  * Handle shortcut command events
@@ -32,6 +33,6 @@ function openCopyIpWindow(version: IpVersionIndex): void {
       type: 'popup',
     })
     .catch((error) => {
-      console.error('Failed to open CopyIP window\n', error);
+      logError('Failed to open CopyIP window\n', error);
     });
 }

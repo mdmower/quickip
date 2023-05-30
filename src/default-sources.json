@@ -1,0 +1,74 @@
+{
+  "v4": {
+    "name": "IPv4",
+    "id": "v4",
+    "default": true,
+    "enabled": true,
+    "sources": {
+      "identme": {
+        "id": "identme",
+        "url": "https://v4.ident.me",
+        "name": "ident.me",
+        "order": 3,
+        "default": false,
+        "enabled": true
+      },
+      "ipify": {
+        "id": "ipify",
+        "url": "https://api.ipify.org",
+        "name": "ipify",
+        "order": 1,
+        "default": false,
+        "enabled": true
+      },
+      "icanhazip": {
+        "id": "icanhazip",
+        "url": "https://ipv4.icanhazip.com",
+        "name": "ICanHazIP",
+        "order": 0,
+        "default": true,
+        "enabled": true
+      },
+      "wtfismyip": {
+        "id": "wtfismyip",
+        "url": "https://ipv4.wtfismyip.com/text",
+        "name": "WTF is my IP?!?!??",
+        "order": 2,
+        "default": false,
+        "enabled": true
+      }
+    }
+  },
+  "v6": {
+    "name": "IPv6",
+    "id": "v6",
+    "default": false,
+    "enabled": true,
+    "sources": {
+      "identme": {
+        "id": "identme",
+        "url": "https://v6.ident.me",
+        "name": "ident.me",
+        "order": 2,
+        "default": false,
+        "enabled": true
+      },
+      "icanhazip": {
+        "id": "icanhazip",
+        "url": "https://ipv6.icanhazip.com",
+        "name": "ICanHazIP",
+        "order": 0,
+        "default": true,
+        "enabled": true
+      },
+      "wtfismyip": {
+        "id": "wtfismyip",
+        "url": "https://ipv6.wtfismyip.com/text",
+        "name": "WTF is my IP?!?!??",
+        "order": 1,
+        "default": false,
+        "enabled": true
+      }
+    }
+  }
+}

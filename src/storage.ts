@@ -2,154 +2,178 @@
  * @license Apache-2.0
  */
 
+import {
+  IpVersionIndex,
+  StorageData,
+  StorageSourceStates,
+  StorageSourceStatesIndex,
+  VersionStatesIndex,
+} from './interfaces';
+import {logInfo} from './logger';
+import {getDefaultSourcesData} from './sources';
+import {getTypedKeys, isRecord} from './utils';
+
+const {storageListenerStatus} = new (class {
+  private status: boolean = true;
+
+  /**
+   * Get/Set the flag indicating the storage listener status
+   * @param enable Status to set for the storage listener or undefined to retrieve the status
+   */
+  public storageListenerStatus = (enable?: boolean): boolean => {
+    if (enable !== undefined) {
+      this.status = enable;
+    }
+    return this.status;
+  };
+})();
+
 /**
- * Storage handling
+ * Handle storage change events and broadcast notification
+ * @param changes StorageChanges from chrome.storage.onChanged
+ * @param namespace Chrome storage area
  */
-class QipStorage {
-  /**
-   * Whether the storage change handler is enabled
-   */
-  private changeHandlerEnabled_: boolean = false;
-
-  /**
-   * Callback functions to run on storage change events
-   */
-  private storageChangeCallbacks_: (() => Promise<void>)[] = [];
-
-  /**
-   * Whether storage has been initialized
-   */
-  private initialized_: boolean = false;
-
-  /**
-   * Initialize (if necessary) storage
-   */
-  public async init(): Promise<void> {
-    if (this.initialized_) {
-      return;
-    }
-    this.initialized_ = true;
-
-    chrome.storage.onChanged.addListener(this.storageChangeHandler.bind(this));
-    this.toggleChangeHandler(true);
-
-    return Promise.resolve();
+export function storageChangeHandler(
+  changes: {[key: string]: chrome.storage.StorageChange},
+  namespace: string
+): void {
+  if (!storageListenerStatus() || namespace !== 'sync') {
+    return;
   }
 
-  /**
-   * Add a callback function to run on storage change events
-   * @param callback Callback function
-   */
-  public addStorageChangeCallback(callback: () => Promise<void>): void {
-    // TODO: Check on 'this' context possibilities. Could a callback
-    // be designed to access private members of this class?
-    this.storageChangeCallbacks_.push(callback);
-  }
-
-  /**
-   * Remove all callback functions from running on storage change events
-   */
-  public clearStorageChangeCallbacks(): void {
-    this.storageChangeCallbacks_ = [];
-  }
-
-  /**
-   * Handle storage change events and broadcast notification
-   * @param changes StorageChanges from chrome.storage.onChanged
-   * @param namespace Chrome storage area
-   *
-   * Note: It is not possible to listen for messages in the same context
-   * (https://bugs.chromium.org/p/chromium/issues/detail?id=479951). So,
-   * storageChangeSourcesHook can be overriden will be called on storage
-   * updates.
-   */
-  private storageChangeHandler(
-    changes: {[key: string]: chrome.storage.StorageChange},
-    namespace: string
-  ): void {
-    if (!this.changeHandlerEnabled_ || namespace !== 'sync') {
-      return;
-    }
-
-    console.log('New settings available from sync storage:\n', changes);
-
-    // Assume order matters and run callbacks sequentially
-    this.storageChangeCallbacks_
-      .reduce((prev, curr, idx) => {
-        return prev
-          .then(curr)
-          .catch((error) =>
-            console.error(
-              `Failed to run callback at index ${idx} after storage change detected\n`,
-              error
-            )
-          );
-      }, Promise.resolve())
-      .catch((error) => console.error(`Failed to run storage change callbacks\n`, error));
-  }
-
-  /**
-   * Enable or disable the storage change handler
-   * @param state Whether storage change handler should be enabled or disabled
-   */
-  public toggleChangeHandler(state: boolean): void {
-    this.changeHandlerEnabled_ = state;
-  }
-
-  /**
-   * Get the value of a stored option
-   * @param option Option name
-   */
-  public async getOption(option: string): Promise<unknown> {
-    return this.getOptions([option]).then((stg) => stg[option]);
-  }
-
-  /**
-   * Get the values of multiple stored options
-   * @param options Option names
-   */
-  public async getOptions(options?: string[]): Promise<Record<string, unknown>> {
-    return new Promise((resolve) => {
-      chrome.storage.sync.get(options || null, resolve);
-    });
-  }
-
-  /**
-   * Set the value of an option in storage
-   * @param option Option name
-   * @param value Option value
-   */
-  public async setOption(option: string, value: unknown): Promise<void> {
-    // Computed property names (ES2015)
-    return this.setOptions({[option]: value});
-  }
-
-  /**
-   * Set the value of multiple options in storage
-   * @param options Option name/value pairs
-   */
-  public async setOptions(options: Record<string, unknown>): Promise<void> {
-    this.toggleChangeHandler(false);
-    return new Promise((resolve) => {
-      chrome.storage.sync.set(options, () => {
-        this.toggleChangeHandler(true);
-        resolve(undefined);
-      });
-    });
-  }
-
-  /**
-   * Clear options from storage
-   */
-  public async clearOptions(): Promise<void> {
-    this.toggleChangeHandler(false);
-    return new Promise((resolve) => {
-      chrome.storage.sync.clear(() => {
-        this.toggleChangeHandler(true);
-        resolve(undefined);
-      });
-    });
-  }
+  logInfo('New settings available from sync storage:\n', changes);
+  // TODO: Send notifications
 }
 
-export {QipStorage};
+/**
+ * Get the value of a stored option
+ * @param name Option name
+ */
+export async function getOption(name: string): Promise<unknown> {
+  return (await getOptions([name]))[name];
+}
+
+/**
+ * Get the values of multiple stored options
+ * @param names Option names
+ */
+export async function getOptions(names?: string[]): Promise<Record<string, unknown>> {
+  return chrome.storage.sync.get(names || null);
+}
+
+/**
+ * Set the value of an option in storage
+ * @param option Option name
+ * @param value Option value
+ */
+export async function setOption(option: string, value: unknown): Promise<void> {
+  return setOptions({[option]: value});
+}
+
+/**
+ * Set the value of multiple options in storage
+ * @param options Option name/value pairs
+ */
+export async function setOptions(options: Record<string, unknown>): Promise<void> {
+  return chrome.storage.sync.set(options);
+}
+
+/**
+ * Clear options from storage
+ */
+export async function clearOptions(): Promise<void> {
+  return chrome.storage.sync.clear();
+}
+
+/**
+ * Get all default storage data
+ */
+export function getDefaultStorageData(): StorageData {
+  const defaultSourcesData = getDefaultSourcesData();
+
+  const getDefaultStorageSourceStates = (version: IpVersionIndex): StorageSourceStates => {
+    return Object.keys(defaultSourcesData[version].sources).reduce<StorageSourceStates>(
+      (sourceState, name) => {
+        const sourcesData = defaultSourcesData[version].sources[name];
+        if (sourcesData) {
+          sourceState[name] = {
+            enabled: sourcesData.enabled,
+            order: sourcesData.order,
+          };
+        }
+        return sourceState;
+      },
+      {}
+    );
+  };
+
+  return {
+    [VersionStatesIndex]: {
+      [IpVersionIndex.V4]: defaultSourcesData[IpVersionIndex.V4].enabled,
+      [IpVersionIndex.V6]: defaultSourcesData[IpVersionIndex.V6].enabled,
+    },
+    [StorageSourceStatesIndex.V4]: getDefaultStorageSourceStates(IpVersionIndex.V4),
+    [StorageSourceStatesIndex.V6]: getDefaultStorageSourceStates(IpVersionIndex.V6),
+  };
+}
+
+/**
+ * Safely overlay default storage data with user storage data
+ */
+export async function getStorageData(): Promise<StorageData> {
+  const userStorageData = await getOptions();
+  if (!isRecord(userStorageData) || !Object.keys(userStorageData).length) {
+    return getDefaultStorageData();
+  }
+
+  // Use default storage data as a reliable tree that can be crawled and look
+  // for corresponding properties in user data.
+  const storageData = getDefaultStorageData();
+  for (const name of getTypedKeys(storageData)) {
+    if (name === VersionStatesIndex) {
+      const userVersionStates = userStorageData[name];
+      if (!isRecord(userVersionStates)) {
+        continue;
+      }
+
+      const versionStates = storageData[name];
+      for (const version of getTypedKeys(versionStates)) {
+        const versionEnabled = userVersionStates[version];
+        if (typeof versionEnabled === 'boolean') {
+          versionStates[version] = versionEnabled;
+        }
+      }
+    } else if (Object.values(StorageSourceStatesIndex).includes(name)) {
+      const userSourceStates = userStorageData[name];
+      if (!isRecord(userSourceStates)) {
+        continue;
+      }
+
+      for (const sourceId of Object.keys(storageData[name])) {
+        const userSourceState = userSourceStates[sourceId];
+        if (!isRecord(userSourceState)) {
+          continue;
+        }
+
+        const sourceState = storageData[name][sourceId];
+        if (!sourceState) {
+          // Won't get here
+          continue;
+        }
+
+        if (typeof userSourceState.enabled === 'boolean') {
+          sourceState.enabled = userSourceState.enabled;
+        }
+        if (
+          typeof userSourceState.order === 'number' &&
+          userSourceState.order >= 0 &&
+          userSourceState.order < 999
+        ) {
+          sourceState.order = Math.floor(userSourceState.order);
+        }
+      }
+    }
+  }
+
+  return storageData;
+}

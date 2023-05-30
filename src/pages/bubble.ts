@@ -2,16 +2,16 @@
  * @license Apache-2.0
  */
 
+import {getIp} from '../actions';
 import {IpVersionIndex} from '../interfaces';
-import {QipActions} from '../actions';
-import {QipSources} from '../sources';
-import {QipStorage} from '../storage';
+import {logError, logInfo} from '../logger';
+import {getVersionData, getVersions} from '../sources';
 
 document.addEventListener(
   'DOMContentLoaded',
   function () {
     new QipBubble().init().catch((error) => {
-      console.error('Unexpected error during initialization', error);
+      logError('Unexpected error during initialization', error);
     });
   },
   false
@@ -19,45 +19,27 @@ document.addEventListener(
 
 class QipBubble {
   /**
-   * IP sources handler
-   */
-  private sources_: QipSources;
-
-  /**
-   * IP actions handler
-   */
-  private actions_: QipActions;
-
-  constructor() {
-    const storage = new QipStorage();
-    this.sources_ = new QipSources(storage);
-    this.actions_ = new QipActions(this.sources_);
-  }
-
-  /**
    * Initialize bubble
    */
   public async init(): Promise<void> {
-    await this.sources_.init();
-    await this.actions_.init();
-    this.initOutputs();
+    await this.initOutputs();
     this.startListeners();
-    this.insertEnabledIPs();
+    await this.insertEnabledIPs();
   }
 
   /**
    * Create elements from templates for bubble
    */
-  private initOutputs() {
-    this.sources_.getVersions().forEach((version) => {
-      const versionData = this.sources_.getVersionData(version);
+  private async initOutputs() {
+    for (const version of getVersions()) {
+      const versionData = await getVersionData(version);
       if (!versionData.enabled) {
-        return;
+        continue;
       }
 
       const template = document.querySelector<HTMLTemplateElement>('#output-template');
       if (!template) {
-        return;
+        continue;
       }
 
       const clone = document.importNode(template.content, true);
@@ -76,7 +58,7 @@ class QipBubble {
       if (container) {
         container.appendChild(clone);
       }
-    });
+    }
 
     const firstButton = document.querySelector('button');
     if (firstButton) {
@@ -97,22 +79,22 @@ class QipBubble {
    * For each enabled IP version, request an IP address and insert
    * it into the bubble output (<input readonly>)
    */
-  private insertEnabledIPs() {
-    this.sources_.getVersions().forEach((version) => {
-      const versionData = this.sources_.getVersionData(version);
+  private async insertEnabledIPs() {
+    for (const version of getVersions()) {
+      const versionData = await getVersionData(version);
       if (!versionData.enabled) {
-        return;
+        continue;
       }
 
       const input = document.querySelector<HTMLInputElement>(`input[data-version="${version}"]`);
       if (!input) {
-        return;
+        continue;
       }
 
       this.insertIP(version, input).catch((error) => {
-        console.error(`Failed to find and output IP${version}`, error);
+        logError(`Failed to find and output IP${version}`, error);
       });
-    });
+    }
   }
 
   /**
@@ -122,7 +104,7 @@ class QipBubble {
    * @param input IP output element
    */
   private async insertIP(version: IpVersionIndex, input: HTMLInputElement): Promise<void> {
-    const ip = await this.actions_.getIP(version);
+    const ip = await getIp(version);
     if (ip) {
       input.value = ip;
       if (version === 'v6') {
@@ -159,16 +141,9 @@ class QipBubble {
       return;
     }
 
-    console.log(`copyIP: Contents: "${inputValue}"`);
+    logInfo(`copyIP: Contents: "${inputValue}"`);
     navigator.clipboard.writeText(inputValue).catch((error) => {
-      console.log('navigator.clipboard.writeText did not succeed; using fallback method\n', error);
-      document.oncopy = function (event) {
-        if (event.clipboardData) {
-          event.clipboardData.setData('text/plain', input.value);
-          event.preventDefault();
-        }
-      };
-      document.execCommand('copy', false, undefined);
+      logError('Failed to copy IP to clipboard', error);
     });
 
     // User feedback

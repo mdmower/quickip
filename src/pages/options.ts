@@ -10,18 +10,23 @@ import {
   StorageData,
   StorageSourceStates,
   StorageVersionStates,
-  getIpVersion,
-  getStorageSourceStatesIndex,
 } from '../interfaces';
-import {QipSources} from '../sources';
-import {QipStorage} from '../storage';
-import {getDefaultStorageData} from '../default-sources';
+import {
+  getDefaultSource,
+  getDefaultVersion,
+  getOrderedSources,
+  getVersionData,
+  getVersions,
+} from '../sources';
+import {clearOptions, getDefaultStorageData, setOptions} from '../storage';
+import {getIpVersion, getStorageSourceStatesIndex} from '../utils';
+import {logError, logWarn} from '../logger';
 
 document.addEventListener(
   'DOMContentLoaded',
   function () {
     new QipOptions().init().catch((error) => {
-      console.error('Unexpected error during initialization', error);
+      logError('Unexpected error during initialization', error);
     });
   },
   false
@@ -34,16 +39,6 @@ interface ListenerConfig {
 }
 
 class QipOptions {
-  /**
-   * Storage handler
-   */
-  private storage_: QipStorage;
-
-  /**
-   * IP sources handler
-   */
-  private sources_: QipSources;
-
   /**
    * Collection of options listeners
    */
@@ -75,21 +70,14 @@ class QipOptions {
     },
   ];
 
-  constructor() {
-    this.storage_ = new QipStorage();
-    this.sources_ = new QipSources(this.storage_);
-  }
-
   /**
    * Initialize options page
    */
   public async init(): Promise<void> {
-    await this.storage_.init();
-    await this.sources_.init();
     this.initAboutVersion();
     this.initWebStoreLink();
-    this.initSourceLists();
-    this.initVersionOptions();
+    await this.initSourceLists();
+    await this.initVersionOptions();
     this.sortifyList();
     this.startListeners();
   }
@@ -101,10 +89,11 @@ class QipOptions {
     /**
      * Listen for settings changes
      */
-    this.storage_.addStorageChangeCallback(async () => {
-      this.notify('Updated settings are available. Please refresh this page.', true);
-      return Promise.resolve();
-    });
+    // TODO:
+    // this.storage_.addStorageChangeCallback(async () => {
+    //   this.notify('Updated settings are available. Please refresh this page.', true);
+    //   return Promise.resolve();
+    // });
 
     this.toggleListeners(true);
   }
@@ -128,10 +117,9 @@ class QipOptions {
   /**
    * Create source list from template
    */
-  private initSourceLists(): void {
-    const versions = this.sources_.getVersions();
-    versions.forEach((version) => {
-      const versionData = this.sources_.getVersionData(version);
+  private async initSourceLists(): Promise<void> {
+    for (const version of getVersions()) {
+      const versionData = await getVersionData(version);
 
       // Append list container to page
       const template = document.querySelector<HTMLTemplateElement>('#list-container-template');
@@ -157,9 +145,7 @@ class QipOptions {
       }
 
       // Populate <ul> with sources
-      const sources = this.sources_
-        .getOrderedSourceIds(version)
-        .map((id) => this.sources_.getSourceData(version, id));
+      const sources = await getOrderedSources(version);
       const sourceList = document.querySelector<HTMLUListElement>(
         `.sortable[data-version="${version}"]`
       );
@@ -171,7 +157,7 @@ class QipOptions {
           }
         });
       }
-    });
+    }
   }
 
   /**
@@ -297,10 +283,9 @@ class QipOptions {
   /**
    * Create version selection from template
    */
-  private initVersionOptions() {
-    const versions = this.sources_.getVersions();
-    versions.forEach((version) => {
-      const versionData = this.sources_.getVersionData(version);
+  private async initVersionOptions() {
+    for (const version of getVersions()) {
+      const versionData = await getVersionData(version);
 
       // Append version options
       const template = document.querySelector<HTMLTemplateElement>('#version_states_template');
@@ -325,7 +310,7 @@ class QipOptions {
       if (versionStatesContainer) {
         versionStatesContainer.appendChild(clone);
       }
-    });
+    }
   }
 
   /**
@@ -352,7 +337,7 @@ class QipOptions {
     }
 
     this.enableAllSourcesAsync(target).catch((error) => {
-      console.warn('Unable to enable all sources', error);
+      logWarn('Unable to enable all sources', error);
     });
   }
 
@@ -378,7 +363,7 @@ class QipOptions {
   private openShortcutsConfig(event: Event): void {
     event.preventDefault();
     chrome.tabs.create({url: 'chrome://extensions/shortcuts'}).catch((error) => {
-      console.warn('Unable to open Chrome Shortcuts', error);
+      logWarn('Unable to open Chrome Shortcuts', error);
     });
   }
 
@@ -387,7 +372,7 @@ class QipOptions {
    */
   public restoreDefaults(): void {
     this.restoreDefaultsAsync().catch((error) => {
-      console.warn('Unable to restore defaults', error);
+      logWarn('Unable to restore defaults', error);
     });
   }
 
@@ -395,9 +380,8 @@ class QipOptions {
    * Restore all settings to defaults
    */
   private async restoreDefaultsAsync(): Promise<void> {
-    await this.storage_.clearOptions();
-    await this.storage_.setOptions(getDefaultStorageData());
-    await this.sources_.applySourceOptions();
+    await clearOptions();
+    await setOptions(getDefaultStorageData());
     location.reload();
   }
 
@@ -406,7 +390,7 @@ class QipOptions {
    */
   public saveOptions(): void {
     this.saveOptionsAsync().catch((error) => {
-      console.warn('Unable to save options', error);
+      logWarn('Unable to save options', error);
     });
   }
 
@@ -417,13 +401,12 @@ class QipOptions {
     const options = {} as StorageData;
     let errorMessage = '';
 
-    const versions = this.sources_.getVersions();
-    versions.forEach((version) => {
+    for (const version of getVersions()) {
       const sourceOrder = this.getSourceOrder(version);
       const enabledSources = this.getEnabledSources(version);
       if (!enabledSources.length) {
-        const defaultId = this.sources_.getDefaultSourceId(version);
-        const defaultSource = this.sources_.getSourceData(version, defaultId);
+        const defaultSource = getDefaultSource(version);
+        const defaultId = defaultSource.id;
         enabledSources.push(defaultId);
 
         const input = document.querySelector<HTMLInputElement>(
@@ -448,15 +431,15 @@ class QipOptions {
         };
       });
       options[getStorageSourceStatesIndex(version)] = states;
-    });
+    }
 
     const versionStates = {} as StorageVersionStates;
     let versionInputs = document.querySelectorAll<HTMLInputElement>(
       '#version-states-container input:checked'
     );
     if (!versionInputs.length) {
-      const defaultVersion = this.sources_.getDefaultVersion();
-      const defaultVersionData = this.sources_.getVersionData(defaultVersion);
+      const defaultVersion = getDefaultVersion();
+      const defaultVersionData = await getVersionData(defaultVersion);
 
       const input = document.querySelector<HTMLInputElement>(
         `#version-states-container input[data-version="${defaultVersion}"]`
@@ -487,8 +470,7 @@ class QipOptions {
       this.notify(errorMessage);
     }
 
-    await this.storage_.setOptions(options);
-    await this.sources_.applySourceOptions();
+    await setOptions(options);
   }
 
   /**
