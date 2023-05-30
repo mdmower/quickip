@@ -1,7 +1,7 @@
 {
   "env": {
     "es2020": true,
-    "browser": true
+    "serviceworker": true
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

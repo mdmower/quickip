@@ -2,10 +2,10 @@
  * @license Apache-2.0
  */
 
-import {IpVersionIndex} from './interfaces';
-import {QipActions} from './actions';
-import {QipStorage} from './storage';
-import {QipSources} from './sources';
+import {IpVersionIndex} from '../interfaces';
+import {QipActions} from '../actions';
+import {QipStorage} from '../storage';
+import {QipSources} from '../sources';
 
 document.addEventListener(
   'DOMContentLoaded',

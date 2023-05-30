@@ -3,10 +3,10 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   entry: {
-    bubble: path.resolve(__dirname, '..', 'src', 'bubble.ts'),
-    options: path.resolve(__dirname, '..', 'src', 'options.ts'),
+    bubble: path.resolve(__dirname, '..', 'src', 'pages', 'bubble.ts'),
+    options: path.resolve(__dirname, '..', 'src', 'pages', 'options.ts'),
     sw: path.resolve(__dirname, '..', 'src', 'sw.ts'),
-    'copy-ip-popup': path.resolve(__dirname, '..', 'src', 'copy-ip-popup.ts'),
+    'copy-ip-popup': path.resolve(__dirname, '..', 'src', 'pages', 'copy-ip-popup.ts'),
   },
   module: {
     rules: [

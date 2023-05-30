@@ -12,10 +12,10 @@ import {
   StorageVersionStates,
   getIpVersion,
   getStorageSourceStatesIndex,
-} from './interfaces';
-import {QipSources} from './sources';
-import {QipStorage} from './storage';
-import {getDefaultStorageData} from './default-sources';
+} from '../interfaces';
+import {QipSources} from '../sources';
+import {QipStorage} from '../storage';
+import {getDefaultStorageData} from '../default-sources';
 
 document.addEventListener(
   'DOMContentLoaded',
