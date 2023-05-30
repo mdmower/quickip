@@ -86,15 +86,6 @@ class QipOptions {
    * Start listeners
    */
   private startListeners(): void {
-    /**
-     * Listen for settings changes
-     */
-    // TODO:
-    // this.storage_.addStorageChangeCallback(async () => {
-    //   this.notify('Updated settings are available. Please refresh this page.', true);
-    //   return Promise.resolve();
-    // });
-
     this.toggleListeners(true);
   }
 

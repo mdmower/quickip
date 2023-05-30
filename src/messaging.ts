@@ -2,7 +2,6 @@
  * @license Apache-2.0
  */
 
-import {StorageData} from './interfaces';
 import {logError} from './logger';
 import {getErrorMessage, isRecord} from './utils';
 
@@ -50,9 +49,7 @@ export async function sendInternalMessageAsync<T extends InternalMessage<unknown
 }
 
 export enum MessageCmd {
-  Logging = 'logging',
   OffscreenDoc = 'offscreen_doc',
-  SettingsUpdated = 'settings_updated',
 }
 
 export enum OffscreenAction {
@@ -69,16 +66,8 @@ export interface OffscreenDoc<T> {
   data: T;
 }
 
-export interface SettingsUpdated {
-  data: Partial<StorageData>;
-}
-
 export interface OffscreenDocMessage<T> extends InternalMessage<OffscreenDoc<T>> {
   cmd: MessageCmd.OffscreenDoc;
-}
-
-export interface SettingsUpdatedMessage extends InternalMessage<SettingsUpdated> {
-  cmd: MessageCmd.SettingsUpdated;
 }
 
 /**
@@ -100,24 +89,4 @@ export function isOffscreenDocMessage(message: unknown): message is OffscreenDoc
  */
 export function isOffscreenAction(val: unknown): val is OffscreenAction {
   return typeof val === 'string' && Object.values<string>(OffscreenAction).includes(val);
-}
-
-/**
- * Verify a message object is a context menu toggled message
- * @param message Unverified message
- */
-export function isSettingsUpdatedMessage(message: unknown): message is SettingsUpdatedMessage {
-  return isRecord(message) && message.cmd === MessageCmd.SettingsUpdated && isRecord(message.data);
-}
-
-/**
- * Verify a message object is an internal message
- * @param message Unverified message
- */
-export function isInternalMessage(message: unknown): message is InternalMessage<unknown> {
-  return (
-    isRecord(message) &&
-    typeof message.cmd === 'string' &&
-    Object.values<string>(MessageCmd).includes(message.cmd)
-  );
 }

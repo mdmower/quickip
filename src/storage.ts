@@ -9,41 +9,8 @@ import {
   StorageSourceStatesIndex,
   VersionStatesIndex,
 } from './interfaces';
-import {logInfo} from './logger';
 import {getDefaultSourcesData} from './sources';
 import {getTypedKeys, isRecord} from './utils';
-
-const {storageListenerStatus} = new (class {
-  private status: boolean = true;
-
-  /**
-   * Get/Set the flag indicating the storage listener status
-   * @param enable Status to set for the storage listener or undefined to retrieve the status
-   */
-  public storageListenerStatus = (enable?: boolean): boolean => {
-    if (enable !== undefined) {
-      this.status = enable;
-    }
-    return this.status;
-  };
-})();
-
-/**
- * Handle storage change events and broadcast notification
- * @param changes StorageChanges from chrome.storage.onChanged
- * @param namespace Chrome storage area
- */
-export function storageChangeHandler(
-  changes: {[key: string]: chrome.storage.StorageChange},
-  namespace: string
-): void {
-  if (!storageListenerStatus() || namespace !== 'sync') {
-    return;
-  }
-
-  logInfo('New settings available from sync storage:\n', changes);
-  // TODO: Send notifications
-}
 
 /**
  * Get the value of a stored option
