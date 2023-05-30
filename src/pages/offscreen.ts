@@ -4,6 +4,7 @@
 
 import {logError} from '../logger';
 import {MessageCmd, OffscreenAction, isOffscreenDocMessage} from '../messaging';
+import {getErrorMessage} from '../utils';
 
 document.addEventListener(
   'DOMContentLoaded',
@@ -88,7 +89,7 @@ class QipOffscreen {
       // Work around Chromium bug https://bugs.chromium.org/p/chromium/issues/detail?id=1377703
       await new Promise((r) => setTimeout(r, 20));
     } catch (ex) {
-      logError('Failed to copy IP to clipboard', ex);
+      logError('Failed to copy IP to clipboard\n', getErrorMessage(ex));
     }
   }
 }

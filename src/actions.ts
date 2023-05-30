@@ -2,7 +2,7 @@ import {isIPv4, isIPv6} from 'is-ip';
 import {IpVersionIndex} from './interfaces';
 import {getDefaultSource, getOrderedEnabledSources} from './sources';
 import {logError, logInfo, logWarn} from './logger';
-import {isRecord} from './utils';
+import {getErrorMessage, isRecord} from './utils';
 
 const fetchTimeout = 5000;
 
@@ -37,7 +37,7 @@ export async function getIp(version: IpVersionIndex): Promise<string | undefined
       } else if (isRecord(ex) && ex.name === 'AbortError') {
         logWarn(`getIp: Request aborted by user for ${url}`);
       } else {
-        logWarn(`getIp: Request failed for ${url}`, ex);
+        logWarn(`getIp: Request failed for ${url}\n`, getErrorMessage(ex));
       }
     }
   }

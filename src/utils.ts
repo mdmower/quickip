@@ -17,6 +17,26 @@ export function getTypedKeys<T extends object>(obj: T): Array<keyof T> {
 }
 
 /**
+ * Stringify an error
+ * @param error Thrown error
+ */
+export function getErrorMessage(error: unknown): string {
+  if (!error) {
+    return '';
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  try {
+    return error.toString();
+  } catch (ex) {
+    return String(error);
+  }
+}
+
+/**
  * Get typed IP version from string
  * @param version IP version string (v4 or v6)
  */

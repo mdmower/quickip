@@ -4,7 +4,7 @@
 
 import {StorageData} from './interfaces';
 import {logError} from './logger';
-import {isRecord} from './utils';
+import {getErrorMessage, isRecord} from './utils';
 
 /**
  * Send an internal message between different parts of the extension
@@ -13,7 +13,7 @@ import {isRecord} from './utils';
  */
 export function sendInternalMessage<T extends InternalMessage<unknown>>(message: T): void {
   sendInternalMessageAsync<T, undefined>(message).catch((error) => {
-    logError('Failed to send message', error);
+    logError('Failed to send message\n', getErrorMessage(error));
   });
 }
 
@@ -45,7 +45,7 @@ export async function sendInternalMessageAsync<T extends InternalMessage<unknown
       return;
     }
 
-    logError('Failed to send message', error);
+    logError('Failed to send message\n', getErrorMessage(error));
   });
 }
 

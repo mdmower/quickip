@@ -6,12 +6,13 @@ import {getIp} from '../actions';
 import {IpVersionIndex} from '../interfaces';
 import {logError, logInfo} from '../logger';
 import {getVersionData, getVersions} from '../sources';
+import {getErrorMessage} from '../utils';
 
 document.addEventListener(
   'DOMContentLoaded',
   function () {
     new QipBubble().init().catch((error) => {
-      logError('Unexpected error during initialization', error);
+      logError('Unexpected error during initialization\n', getErrorMessage(error));
     });
   },
   false
@@ -92,7 +93,7 @@ class QipBubble {
       }
 
       this.insertIP(version, input).catch((error) => {
-        logError(`Failed to find and output IP${version}`, error);
+        logError(`Failed to find and output IP${version}\n`, getErrorMessage(error));
       });
     }
   }
@@ -143,7 +144,7 @@ class QipBubble {
 
     logInfo(`copyIP: Contents: "${inputValue}"`);
     navigator.clipboard.writeText(inputValue).catch((error) => {
-      logError('Failed to copy IP to clipboard', error);
+      logError('Failed to copy IP to clipboard\n', getErrorMessage(error));
     });
 
     // User feedback

@@ -7,6 +7,7 @@ import {
   OffscreenDocMessage,
   sendInternalMessageAsync,
 } from './messaging';
+import {getErrorMessage} from './utils';
 
 /**
  * Handle shortcut command events
@@ -14,7 +15,7 @@ import {
  */
 export function handleCommand(command: string): void {
   asyncHandleCommand(command).catch((error) => {
-    logError('Failed to handle command', error);
+    logError('Failed to handle command\n', getErrorMessage(error));
   });
 }
 
@@ -66,7 +67,7 @@ async function copyIpOffscreen(version: IpVersionIndex): Promise<void> {
       logError('Offscreen document did not complete copy IP procedure');
     }
   } catch (ex) {
-    logError('Failed to communicate with offscreen document', ex);
+    logError('Failed to communicate with offscreen document\n', getErrorMessage(ex));
   } finally {
     await chrome.offscreen.closeDocument();
   }

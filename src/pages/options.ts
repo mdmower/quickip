@@ -19,14 +19,14 @@ import {
   getVersions,
 } from '../sources';
 import {clearOptions, getDefaultStorageData, setOptions} from '../storage';
-import {getIpVersion, getStorageSourceStatesIndex} from '../utils';
+import {getErrorMessage, getIpVersion, getStorageSourceStatesIndex} from '../utils';
 import {logError, logWarn} from '../logger';
 
 document.addEventListener(
   'DOMContentLoaded',
   function () {
     new QipOptions().init().catch((error) => {
-      logError('Unexpected error during initialization', error);
+      logError('Unexpected error during initialization\n', getErrorMessage(error));
     });
   },
   false
@@ -337,7 +337,7 @@ class QipOptions {
     }
 
     this.enableAllSourcesAsync(target).catch((error) => {
-      logWarn('Unable to enable all sources', error);
+      logWarn('Unable to enable all sources\n', getErrorMessage(error));
     });
   }
 
@@ -363,7 +363,7 @@ class QipOptions {
   private openShortcutsConfig(event: Event): void {
     event.preventDefault();
     chrome.tabs.create({url: 'chrome://extensions/shortcuts'}).catch((error) => {
-      logWarn('Unable to open Chrome Shortcuts', error);
+      logWarn('Unable to open Chrome Shortcuts\n', getErrorMessage(error));
     });
   }
 
@@ -372,7 +372,7 @@ class QipOptions {
    */
   public restoreDefaults(): void {
     this.restoreDefaultsAsync().catch((error) => {
-      logWarn('Unable to restore defaults', error);
+      logWarn('Unable to restore defaults\n', getErrorMessage(error));
     });
   }
 
@@ -390,7 +390,7 @@ class QipOptions {
    */
   public saveOptions(): void {
     this.saveOptionsAsync().catch((error) => {
-      logWarn('Unable to save options', error);
+      logWarn('Unable to save options\n', getErrorMessage(error));
     });
   }
 
