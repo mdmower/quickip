@@ -1,0 +1,57 @@
+/**
+ * @license Apache-2.0
+ */
+
+@import '~bootstrap/scss/bootstrap';
+
+body {
+  background: $light;
+  padding: 3rem 0;
+}
+
+@include color-mode(dark) {
+  body {
+    background: $black;
+  }
+}
+
+.page-title {
+  color: $blue;
+}
+
+.page-content {
+  width: 950px;
+  padding: 2rem;
+  background: $white;
+  border-radius: 1rem;
+}
+
+@include color-mode(dark) {
+  .page-content {
+    background: $dark;
+  }
+}
+
+.icon {
+  width: $font-size-base;
+  height: $font-size-base;
+
+  &.bigger {
+    width: 1.25 * $font-size-base;
+    height: 1.25 * $font-size-base;
+  }
+}
+
+#sources-container {
+  .sortable-ghost {
+    background-color: transparent;
+  }
+
+  .handle {
+    cursor: move;
+  }
+}
+
+.modal-dialog {
+  max-width: 600px;
+}

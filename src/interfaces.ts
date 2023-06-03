@@ -19,9 +19,23 @@ export enum StorageSourceStatesIndex {
 }
 
 /**
+ * Bootstrap display theme
+ */
+export enum DisplayTheme {
+  System = 'system',
+  Light = 'light',
+  Dark = 'dark',
+}
+
+/**
  * Storage key for IP version states
  */
 export const VersionStatesIndex = 'version_states';
+
+/**
+ * Storage key for display theme
+ */
+export const DisplayThemeSetting = 'theme';
 
 /**
  * Information about an individual source
@@ -79,6 +93,7 @@ export interface StorageSourceStates {
  * Data in Chrome storage
  */
 export type StorageData = {
+  [DisplayThemeSetting]: DisplayTheme;
   [VersionStatesIndex]: StorageVersionStates;
 } & {
   [name in StorageSourceStatesIndex]: StorageSourceStates;

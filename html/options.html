@@ -5,94 +5,154 @@
   <head>
     <title>QuickIP Options</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="options.css" />
     <script src="options.js"></script>
   </head>
   <body>
-    <svg
-      class="hidden"
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-    >
+    <!-- prettier-ignore -->
+    <svg hidden version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <defs>
-        <symbol id="icon-cog" viewBox="0 0 32 32">
-          <title>Options</title>
-          <path
-            d="M29.181 19.070c-1.679-2.908-0.669-6.634 2.255-8.328l-3.145-5.447c-0.898 0.527-1.943 0.829-3.058 0.829-3.361 0-6.085-2.742-6.085-6.125h-6.289c0.008 1.044-0.252 2.103-0.811 3.070-1.679 2.908-5.411 3.897-8.339 2.211l-3.144 5.447c0.905 0.515 1.689 1.268 2.246 2.234 1.676 2.903 0.672 6.623-2.241 8.319l3.145 5.447c0.895-0.522 1.935-0.82 3.044-0.82 3.35 0 6.067 2.725 6.084 6.092h6.289c-0.003-1.034 0.259-2.080 0.811-3.038 1.676-2.903 5.399-3.894 8.325-2.219l3.145-5.447c-0.899-0.515-1.678-1.266-2.232-2.226zM16 22.479c-3.578 0-6.479-2.901-6.479-6.479s2.901-6.479 6.479-6.479c3.578 0 6.479 2.901 6.479 6.479s-2.901 6.479-6.479 6.479z"
-          ></path>
+        <symbol id="icon-settings" viewBox="0 0 16 16">
+          <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+          <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
         </symbol>
-        <symbol id="icon-info" viewBox="0 0 32 32">
-          <title>About</title>
-          <path
-            d="M14 9.5c0-0.825 0.675-1.5 1.5-1.5h1c0.825 0 1.5 0.675 1.5 1.5v1c0 0.825-0.675 1.5-1.5 1.5h-1c-0.825 0-1.5-0.675-1.5-1.5v-1z"
-          ></path>
-          <path d="M20 24h-8v-2h2v-6h-2v-2h6v8h2z"></path>
-          <path
-            d="M16 0c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16zM16 29c-7.18 0-13-5.82-13-13s5.82-13 13-13 13 5.82 13 13-5.82 13-13 13z"
-          ></path>
+        <symbol id="icon-about" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
         </symbol>
       </defs>
     </svg>
-    <h1 id="optionsTitle">QuickIP Options</h1>
-    <div class="tabs">
-      <input type="radio" id="options_tab" name="tab-control" checked />
-      <input type="radio" id="about_tab" name="tab-control" />
-      <ul>
-        <li title="Options">
-          <label for="options_tab" role="button">
-            <svg class="icon icon-cog"><use xlink:href="#icon-cog"></use></svg>
-            <br />
-            <span>Options</span>
-          </label>
-        </li>
-        <li title="About">
-          <label for="about_tab" role="button">
-            <svg class="icon icon-info"><use xlink:href="#icon-info"></use></svg>
-            <br />
-            <span>About</span>
-          </label>
-        </li>
-      </ul>
-      <div class="slider">
-        <div class="indicator"></div>
+
+    <h1 class="page-title text-center mb-3">QuickIP Options</h1>
+
+    <div class="page-content mx-auto">
+      <div class="container-fluid mb-3">
+        <ul id="main-nav" class="nav nav-pills justify-content-center" role="tablist">
+          <li title="Options" class="nav-item mx-5" role="presentation">
+            <button
+              class="nav-link active"
+              id="pills-options-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#pills-options"
+              data-hash="tab-options"
+              type="button"
+              role="tab"
+              aria-controls="pills-options"
+              aria-selected="true"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-settings"
+                fill="currentColor"
+              >
+                <use xlink:href="#icon-settings"></use>
+              </svg>
+              <span class="d-inline-block align-middle">Options</span>
+            </button>
+          </li>
+          <li title="About" class="nav-item mx-5" role="presentation">
+            <button
+              class="nav-link"
+              id="pills-about-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#pills-about"
+              data-hash="tab-about"
+              type="button"
+              role="tab"
+              aria-controls="pills-about"
+              aria-selected="false"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-about" fill="currentColor">
+                <use xlink:href="#icon-about"></use>
+              </svg>
+              <span class="d-inline-block align-middle">About</span>
+            </button>
+          </li>
+        </ul>
       </div>
 
-      <div class="content">
-        <section id="content-options">
-          <div class="option-container">
-            <h3 class="option-title">Versions</h3>
-            <p id="version-states-text">
-              Select the IP version(s) shown in the browser action bubble.
-            </p>
-            <div id="version-states-container"></div>
+      <div class="tab-content" id="pills-tabContent">
+        <section
+          class="container-fluid tab-pane show active"
+          id="pills-options"
+          role="tabpanel"
+          aria-labelledby="pills-options-tab"
+        >
+          <div class="row mt-5">
+            <div class="col">
+              <h4>Theme</h4>
+              <div class="row align-items-center gx-3">
+                <div class="col-auto">
+                  <label for="theme">Display theme</label>
+                </div>
+                <div class="col-auto">
+                  <select
+                    type="selection"
+                    id="theme"
+                    class="form-select"
+                    aria-label="Select light or dark theme"
+                  >
+                    <option value="system">System</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="option-container">
-            <h3 class="option-title">Sources</h3>
-            <p>
-              Prioritize IP resolvers via drag-and-drop and enable/disable sources via checkbox.
-            </p>
-            <div id="sources-container"></div>
+          <div class="row mt-5">
+            <div class="col">
+              <h4>Versions</h4>
+              <div id="version-states-container">
+                <span class="form-check-inline">Enabled IP versions</span>
+              </div>
+            </div>
           </div>
 
-          <div class="option-container">
-            <h3 class="option-title">Shortcuts</h3>
-            <p>
-              You can copy your IP to the clipboard with a keyboard shortcut at any time. See
-              <a href="#" id="keyboard-shortcut-config">here</a> for configuration.
-            </p>
+          <div class="row mt-5">
+            <div class="col">
+              <h4>Sources</h4>
+              <p>
+                Prioritize IP resolvers via drag-and-drop and enable/disable sources via checkbox.
+              </p>
+              <div id="sources-container" class="row gx-3"></div>
+            </div>
           </div>
 
-          <div class="option-container">
-            <h3 class="option-title">Reset</h3>
-            <span class="restore-defaults-text">Reset all settings to defaults</span>
-            <button id="restore-defaults">Restore Defaults</button>
+          <div class="row mt-5">
+            <div class="col">
+              <h4>Shortcuts</h4>
+              <div>
+                You can copy your IP to the clipboard with a keyboard shortcut at any time. See
+                <a href="#" id="keyboard-shortcut-config">here</a> for configuration.
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-5">
+            <div class="col">
+              <h4>Reset</h4>
+              <div class="row gx-3">
+                <div class="col-auto col-form-label">Reset all settings to defaults</div>
+                <div class="col-auto">
+                  <button id="restore-defaults" class="btn btn-outline-danger btn-sm">
+                    Restore Defaults
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section id="content_about">
-          <img id="extLogo" src="icons/icon-vector.svg" />
+        <section
+          class="container-fluid tab-pane"
+          id="pills-about"
+          role="tabpanel"
+          aria-labelledby="pills-about-tab"
+        >
+          <div class="row mt-5 mb-3 justify-content-md-center">
+            <img class="col-md-2" src="icons/icon-vector.svg" />
+          </div>
           <p id="optionsVersion">Version <span id="extensionVersion"></span></p>
           <p id="optionsDisclaimer">
             QuickIP is open source software, licensed under the
@@ -117,34 +177,53 @@
         </section>
       </div>
     </div>
-    <div id="notify">
-      <div id="modal">
-        <p class="msg"></p>
-        <button></button>
+
+    <!-- Modal -->
+    <div class="modal" id="notice" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Notice</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body"></div>
+        </div>
       </div>
     </div>
-    <template id="version_states_template">
-      <label><input type="checkbox" name="version_states" /> </label>
-    </template>
-    <template id="list-container-template">
-      <div class="list-container">
-        <p class="title"></p>
-        <ul class="sortable"></ul>
-        <p class="enable-all-container">
-          <button class="enable-all">Enable All</button>
-        </p>
+
+    <!-- Templates -->
+    <template id="version-states-template">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" name="version_states" />
+        <label class="form-check-label"></label>
       </div>
     </template>
-    <template id="sortable_li_template">
-      <li>
-        <span class="handle">
-          <svg class="icon icon-move-vertical" viewBox="0 0 12 32">
-            <title>move-vertical</title>
+    <template id="list-container-template">
+      <div class="col">
+        <div class="title text-center mb-1"></div>
+        <ul class="sortable list-group list-group-flush mb-2"></ul>
+        <div class="text-center">
+          <button class="enable-all btn btn-outline-primary btn-sm">Enable All</button>
+        </div>
+      </div>
+    </template>
+    <template id="sortable-li-template">
+      <li class="list-group-item list-group-item-light d-flex">
+        <div class="form-check form-check-inline">
+          <input class="source-checkbox form-check-input" type="checkbox" />
+          <a class="source-link form-check-label" target="_blank"></a>
+        </div>
+        <span class="handle ms-auto">
+          <svg class="icon icon-move-vertical" viewBox="0 0 12 32" fill="currentColor">
+            <title>Move</title>
             <path d="M8 20v6h4l-6 6-6-6h4v-6zM4 12v-6h-4l6-6 6 6h-4v6z"></path>
           </svg>
         </span>
-        <input class="source-checkbox" type="checkbox" />
-        <a class="source-link" target="_blank"></a>
       </li>
     </template>
   </body>

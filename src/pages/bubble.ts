@@ -2,11 +2,13 @@
  * @license Apache-2.0
  */
 
+import '../css/bubble.scss';
 import {getIp} from '../actions';
 import {IpVersionIndex} from '../interfaces';
 import {logError, logInfo} from '../logger';
 import {getVersionData, getVersions} from '../sources';
 import {getErrorMessage} from '../utils';
+import {applyTheme} from './utils';
 
 document.addEventListener(
   'DOMContentLoaded',
@@ -23,6 +25,7 @@ class QipBubble {
    * Initialize bubble
    */
   public async init(): Promise<void> {
+    await applyTheme(window);
     await this.initOutputs();
     this.startListeners();
     await this.insertEnabledIPs();
@@ -44,27 +47,35 @@ class QipBubble {
       }
 
       const clone = document.importNode(template.content, true);
+      const id = `output-${versionData.name}`;
 
-      const versionNode = clone.querySelector<HTMLSpanElement>('label span');
-      if (versionNode) {
-        versionNode.textContent = versionData.name;
+      const labelEl = clone.querySelector<HTMLLabelElement>('label');
+      if (labelEl) {
+        labelEl.textContent = versionData.name;
+        labelEl.htmlFor = id;
       }
 
-      const dataNodes = clone.querySelectorAll('input,button');
-      Array.from(dataNodes).forEach((elm) => {
-        elm.setAttribute('data-version', version);
-      });
-
-      const container = document.querySelector<HTMLDivElement>('#container');
-      if (container) {
-        container.appendChild(clone);
+      const inputEl = clone.querySelector<HTMLInputElement>('input');
+      if (inputEl) {
+        inputEl.id = id;
+        inputEl.dataset.version = version;
       }
+
+      const spanEl = clone.querySelector<HTMLSpanElement>('span');
+      if (spanEl) {
+        spanEl.dataset.version = version;
+      }
+
+      const buttonEl = clone.querySelector<HTMLButtonElement>('button');
+      if (buttonEl) {
+        buttonEl.dataset.version = version;
+      }
+
+      document.querySelector<HTMLDivElement>('#container')?.appendChild(clone);
     }
 
-    const firstButton = document.querySelector('button');
-    if (firstButton) {
-      firstButton.focus();
-    }
+    // Focus first button
+    document.querySelector('button')?.focus();
   }
 
   /**
@@ -88,11 +99,12 @@ class QipBubble {
       }
 
       const input = document.querySelector<HTMLInputElement>(`input[data-version="${version}"]`);
-      if (!input) {
+      const span = document.querySelector<HTMLSpanElement>(`span[data-version="${version}"]`);
+      if (!input || !span) {
         continue;
       }
 
-      this.insertIP(version, input).catch((error) => {
+      this.insertIP(version, input, span).catch((error) => {
         logError(`Failed to find and output IP${version}\n`, getErrorMessage(error));
       });
     }
@@ -103,18 +115,35 @@ class QipBubble {
    * specified input element
    * @param version IP version
    * @param input IP output element
+   * @param span Temporary sizing element
    */
-  private async insertIP(version: IpVersionIndex, input: HTMLInputElement): Promise<void> {
+  private async insertIP(
+    version: IpVersionIndex,
+    input: HTMLInputElement,
+    span: HTMLSpanElement
+  ): Promise<void> {
     const ip = await getIp(version);
     if (ip) {
       input.value = ip;
-      if (version === 'v6') {
-        input.setAttribute('size', '39');
-      }
+      this.resizeBody(input, span);
     } else {
       input.value = '';
-      input.placeholder = 'Not Found';
+      input.placeholder = 'Not found';
     }
+  }
+
+  /**
+   * Increase the size of the body if necessary to accomodate a long IP address
+   * @param input IP output element
+   * @param span Temporary sizing element
+   */
+  private resizeBody(input: HTMLInputElement, span: HTMLSpanElement): void {
+    input.hidden = true;
+    span.hidden = false;
+    span.textContent = input.value;
+    document.body.style.minWidth = `${document.body.offsetWidth + 5}px`;
+    span.remove();
+    input.hidden = false;
   }
 
   /**
@@ -147,10 +176,10 @@ class QipBubble {
       logError('Failed to copy IP to clipboard\n', getErrorMessage(error));
     });
 
-    // User feedback
-    input.style.color = 'blue';
+    input.focus();
     setTimeout(() => {
-      input.style.removeProperty('color');
-    }, 300);
+      input.blur();
+      button.focus();
+    }, 200);
   }
 }

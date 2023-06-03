@@ -1,4 +1,4 @@
-import {IpVersionIndex, StorageSourceStatesIndex} from './interfaces';
+import {DisplayTheme, IpVersionIndex, StorageSourceStatesIndex} from './interfaces';
 
 /**
  * Determine whether a variable is a record-type object (excluding functions, arrays, and null)
@@ -6,6 +6,14 @@ import {IpVersionIndex, StorageSourceStatesIndex} from './interfaces';
  */
 export function isRecord(val: unknown): val is Record<string, unknown> {
   return typeof val === 'object' && !!val && !Array.isArray(val);
+}
+
+/**
+ * Determine whether a variable is a valid DisplayTheme
+ * @param val Candidate value
+ */
+export function isDisplayTheme(val: unknown): val is DisplayTheme {
+  return typeof val === 'string' && Object.values<string>(DisplayTheme).includes(val);
 }
 
 /**

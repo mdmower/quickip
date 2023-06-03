@@ -3,6 +3,8 @@
  */
 
 import {
+  DisplayTheme,
+  DisplayThemeSetting,
   IpVersionIndex,
   StorageData,
   StorageSourceStates,
@@ -10,7 +12,7 @@ import {
   VersionStatesIndex,
 } from './interfaces';
 import {getDefaultSourcesData} from './sources';
-import {getTypedKeys, isRecord} from './utils';
+import {getTypedKeys, isDisplayTheme, isRecord} from './utils';
 
 /**
  * Get the value of a stored option
@@ -75,6 +77,7 @@ export function getDefaultStorageData(): StorageData {
   };
 
   return {
+    [DisplayThemeSetting]: DisplayTheme.System,
     [VersionStatesIndex]: {
       [IpVersionIndex.V4]: defaultSourcesData[IpVersionIndex.V4].enabled,
       [IpVersionIndex.V6]: defaultSourcesData[IpVersionIndex.V6].enabled,
@@ -85,10 +88,13 @@ export function getDefaultStorageData(): StorageData {
 }
 
 /**
- * Safely overlay default storage data with user storage data
+ * Safely overlay default storage data with partial user storage data
+ * @param keys Only retrieve the indicated storage keys and leave the remaining
+ * settings at their defaults, reducing the amount of data that is requested
+ * from the storage service.
  */
-export async function getStorageData(): Promise<StorageData> {
-  const userStorageData = await getOptions();
+async function getPartialStorageData(keys: Array<keyof StorageData>): Promise<StorageData> {
+  const userStorageData = await getOptions(keys);
   if (!isRecord(userStorageData) || !Object.keys(userStorageData).length) {
     return getDefaultStorageData();
   }
@@ -109,6 +115,11 @@ export async function getStorageData(): Promise<StorageData> {
         if (typeof versionEnabled === 'boolean') {
           versionStates[version] = versionEnabled;
         }
+      }
+    } else if (name === DisplayThemeSetting) {
+      const userTheme = userStorageData[name];
+      if (isDisplayTheme(userTheme)) {
+        storageData[name] = userTheme;
       }
     } else if (Object.values(StorageSourceStatesIndex).includes(name)) {
       const userSourceStates = userStorageData[name];
@@ -143,4 +154,22 @@ export async function getStorageData(): Promise<StorageData> {
   }
 
   return storageData;
+}
+
+/**
+ * Safely overlay default storage data with user storage data
+ */
+export async function getStorageData(): Promise<StorageData> {
+  const keys = getTypedKeys(getDefaultStorageData());
+  return getPartialStorageData(keys);
+}
+
+/**
+ * Safely overlay an individual default storage data item with user storage data
+ * @param key Storage key
+ */
+export async function getIndividualStorageData<T extends keyof StorageData>(
+  key: keyof StorageData
+): Promise<StorageData[T]> {
+  return (await getPartialStorageData([key]))[key] as StorageData[T];
 }

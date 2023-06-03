@@ -2,9 +2,12 @@
  * @license Apache-2.0
  */
 
+import '../css/options.scss';
+import 'bootstrap/js/dist/tab';
+import Modal from 'bootstrap/js/dist/modal';
 import Sortable from 'sortablejs';
-
 import {
+  DisplayThemeSetting,
   IndividualSource,
   IpVersionIndex,
   StorageData,
@@ -19,8 +22,9 @@ import {
   getVersions,
 } from '../sources';
 import {clearOptions, getDefaultStorageData, setOptions} from '../storage';
-import {getErrorMessage, getIpVersion, getStorageSourceStatesIndex} from '../utils';
+import {getErrorMessage, getStorageSourceStatesIndex, isDisplayTheme} from '../utils';
 import {logError, logWarn} from '../logger';
+import {applyTheme} from './utils';
 
 document.addEventListener(
   'DOMContentLoaded',
@@ -43,6 +47,11 @@ class QipOptions {
    * Collection of options listeners
    */
   private listenerMap_: Array<ListenerConfig> = [
+    {
+      selector: '#theme',
+      event: 'change',
+      callback: this.saveOptions.bind(this),
+    },
     {
       selector: '#version-states-container input[name="version_states"]',
       event: 'change',
@@ -76,6 +85,7 @@ class QipOptions {
   public async init(): Promise<void> {
     this.initAboutVersion();
     this.initWebStoreLink();
+    await applyTheme(window);
     await this.initSourceLists();
     await this.initVersionOptions();
     this.sortifyList();
@@ -86,21 +96,9 @@ class QipOptions {
    * Start listeners
    */
   private startListeners(): void {
-    this.toggleListeners(true);
-  }
-
-  /**
-   * Toggle all event listeners on/off (does not handle Sortable update listener)
-   * @param enable Whether listeners should be enabled or disabled
-   */
-  private toggleListeners(enable: boolean): void {
     this.listenerMap_.forEach((listenerData) => {
       document.querySelectorAll(listenerData.selector).forEach((elm) => {
-        if (enable) {
-          elm.addEventListener(listenerData.event, listenerData.callback);
-        } else {
-          elm.removeEventListener(listenerData.event, listenerData.callback);
-        }
+        elm.addEventListener(listenerData.event, listenerData.callback);
       });
     });
   }
@@ -160,7 +158,7 @@ class QipOptions {
     version: IpVersionIndex,
     source: IndividualSource
   ): DocumentFragment | undefined {
-    const template = document.querySelector<HTMLTemplateElement>('#sortable_li_template');
+    const template = document.querySelector<HTMLTemplateElement>('#sortable-li-template');
     if (!template) {
       return;
     }
@@ -228,47 +226,17 @@ class QipOptions {
   }
 
   /**
-   * Prepare and show a modal with a message. If 'refresh' is true,
-   * then a Refresh button is shown instead of 'OK' and the user must
-   * refresh the page.
+   * Show a modal with a message
    * @param msg Message for notification
-   * @param refresh Whether page refresh is required upon notification confirmation
    */
-  private notify(msg: string, refresh?: boolean) {
-    const notifyElement = document.querySelector<HTMLDivElement>('#notify');
-    const notifyMsg = notifyElement?.querySelector<HTMLParagraphElement>('.msg');
-    const button = notifyElement?.querySelector('button');
-    if (!notifyElement || !notifyMsg || !button) {
+  private notify(msg: string) {
+    const bodyEl = document.querySelector('#notice .modal-body');
+    if (!bodyEl) {
       return;
     }
 
-    notifyMsg.textContent = msg;
-
-    const reload = function () {
-      location.reload();
-    };
-
-    const closeModal = function (event: KeyboardEvent | MouseEvent) {
-      if (
-        (event.type === 'keyup' && (event as KeyboardEvent).key === 'Escape') ||
-        (event.type === 'click' && (event as MouseEvent).target === button)
-      ) {
-        notifyElement.style.display = 'none';
-        document.removeEventListener('keyup', closeModal);
-      }
-    };
-
-    if (refresh) {
-      button.textContent = 'Refresh';
-      button.onclick = reload;
-    } else {
-      button.textContent = 'OK';
-      button.onclick = closeModal;
-      document.addEventListener('keyup', closeModal);
-    }
-
-    notifyElement.style.display = 'block';
-    button.focus();
+    bodyEl.textContent = msg;
+    new Modal('#notice').show();
   }
 
   /**
@@ -279,28 +247,28 @@ class QipOptions {
       const versionData = await getVersionData(version);
 
       // Append version options
-      const template = document.querySelector<HTMLTemplateElement>('#version_states_template');
+      const template = document.querySelector<HTMLTemplateElement>('#version-states-template');
       if (!template) {
         return;
       }
 
       const clone = document.importNode(template.content, true);
+      const id = `version-state-${version}`;
+
       const label = clone.querySelector('label');
       if (label) {
-        label.innerHTML += versionData.name;
+        label.textContent = versionData.name;
+        label.htmlFor = id;
       }
+
       const input = clone.querySelector('input');
       if (input) {
-        input.setAttribute('data-version', version);
+        input.id = id;
+        input.dataset.version = version;
         input.checked = versionData.enabled;
       }
 
-      const versionStatesContainer = document.querySelector<HTMLDivElement>(
-        '#version-states-container'
-      );
-      if (versionStatesContainer) {
-        versionStatesContainer.appendChild(clone);
-      }
+      document.querySelector<HTMLDivElement>('#version-states-container')?.appendChild(clone);
     }
   }
 
@@ -311,7 +279,6 @@ class QipOptions {
     const sortableLists = document.querySelectorAll<HTMLUListElement>('ul.sortable');
     sortableLists.forEach((list) => {
       new Sortable(list, {
-        ghostClass: 'ui-sortable-placeholder',
         onUpdate: this.saveOptions.bind(this),
       });
     });
@@ -389,8 +356,14 @@ class QipOptions {
    * Save all options to storage
    */
   private async saveOptionsAsync(): Promise<void> {
-    const options = {} as StorageData;
+    const options: Partial<StorageData> = {};
     let errorMessage = '';
+
+    const theme = document.querySelector<HTMLSelectElement>('#theme')?.value;
+    if (isDisplayTheme(theme)) {
+      options[DisplayThemeSetting] = theme;
+      await applyTheme(window, theme);
+    }
 
     for (const version of getVersions()) {
       const sourceOrder = this.getSourceOrder(version);
@@ -414,7 +387,7 @@ class QipOptions {
         }
       }
 
-      const states = {} as StorageSourceStates;
+      const states: Partial<StorageSourceStates> = {};
       sourceOrder.forEach((id, index) => {
         states[id] = {
           order: index,
@@ -424,13 +397,12 @@ class QipOptions {
       options[getStorageSourceStatesIndex(version)] = states;
     }
 
-    const versionStates = {} as StorageVersionStates;
-    let versionInputs = document.querySelectorAll<HTMLInputElement>(
+    const versionInputs = document.querySelectorAll<HTMLInputElement>(
       '#version-states-container input:checked'
     );
     if (!versionInputs.length) {
       const defaultVersion = getDefaultVersion();
-      const defaultVersionData = await getVersionData(defaultVersion);
+      const {name} = await getVersionData(defaultVersion);
 
       const input = document.querySelector<HTMLInputElement>(
         `#version-states-container input[data-version="${defaultVersion}"]`
@@ -440,23 +412,24 @@ class QipOptions {
       }
 
       if (!errorMessage) {
-        errorMessage =
-          'At least one IP version must be enabled.' +
-          ` "${defaultVersionData.name}" has been automatically enabled.`;
+        errorMessage = `At least one IP version must be enabled. ${name} has been automatically enabled.`;
       }
     }
-    versionInputs = document.querySelectorAll<HTMLInputElement>('#version-states-container input');
-    versionInputs.forEach((input) => {
-      const version = input.getAttribute('data-version');
-      if (!version) {
-        return;
-      }
-      versionStates[getIpVersion(version)] = input.checked;
-    });
+
+    const versionStates: StorageVersionStates = {
+      [IpVersionIndex.V4]:
+        document.querySelector<HTMLInputElement>(
+          `#version-states-container input[data-version="${IpVersionIndex.V4}"]`
+        )?.checked ?? false,
+      [IpVersionIndex.V6]:
+        document.querySelector<HTMLInputElement>(
+          `#version-states-container input[data-version="${IpVersionIndex.V6}"]`
+        )?.checked ?? false,
+    };
     options.version_states = versionStates;
 
-    // Notify on error, but do not prevent options from saving since
-    // the issue has been remedied.
+    // Notify on error, but do not prevent options from saving since the issue
+    // has been remedied.
     if (errorMessage) {
       this.notify(errorMessage);
     }
