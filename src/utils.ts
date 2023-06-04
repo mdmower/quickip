@@ -45,17 +45,6 @@ export function getErrorMessage(error: unknown): string {
 }
 
 /**
- * Get typed IP version from string
- * @param version IP version string (v4 or v6)
- */
-export function getIpVersion(version: string): IpVersionIndex {
-  if (version === IpVersionIndex.V4 || version === IpVersionIndex.V6) {
-    return version;
-  }
-  throw new Error(`Could not identify IP version index from string "${version}"`);
-}
-
-/**
  * Get IP version corresponding to a storage sources state index
  * @param sssi Storage sources state index
  */

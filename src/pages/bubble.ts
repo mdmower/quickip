@@ -82,14 +82,14 @@ class QipBubble {
    * Listen for 'Copy' button clicks
    */
   private startListeners() {
-    Array.from(document.querySelectorAll('button')).forEach((button) => {
+    Array.from(document.querySelectorAll<HTMLButtonElement>('button')).forEach((button) => {
       button.addEventListener('click', this.copyIP.bind(this));
     });
   }
 
   /**
-   * For each enabled IP version, request an IP address and insert
-   * it into the bubble output (<input readonly>)
+   * For each enabled IP version, request an IP address and insert it into the
+   * bubble output (<input readonly>).
    */
   private async insertEnabledIPs() {
     for (const version of getVersions()) {
@@ -111,8 +111,7 @@ class QipBubble {
   }
 
   /**
-   * Request an IP address for the given version and insert it into the
-   * specified input element
+   * Request an IP address for the given version and insert it into page
    * @param version IP version
    * @param input IP output element
    * @param span Temporary sizing element
@@ -151,12 +150,12 @@ class QipBubble {
    * @param event Mouse click event
    */
   private copyIP(event: MouseEvent) {
-    const button = event.currentTarget as HTMLButtonElement | null;
-    if (!button) {
+    if (!(event.currentTarget instanceof HTMLButtonElement)) {
       return;
     }
 
-    const version = button.getAttribute('data-version');
+    const button = event.currentTarget;
+    const {version} = button.dataset;
     if (!version) {
       return;
     }

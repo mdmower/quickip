@@ -10,18 +10,22 @@ import {
   DisplayThemeSetting,
   IndividualSource,
   IpVersionIndex,
-  StorageData,
-  StorageSourceStates,
-  StorageVersionStates,
+  VersionStatesIndex,
 } from '../interfaces';
 import {
   getDefaultSource,
+  getDefaultSourcesData,
   getDefaultVersion,
   getOrderedSources,
   getVersionData,
   getVersions,
 } from '../sources';
-import {clearOptions, getDefaultStorageData, setOptions} from '../storage';
+import {
+  clearOptions,
+  getDefaultStorageData,
+  getIndividualStorageData,
+  setOptions,
+} from '../storage';
 import {getErrorMessage, getStorageSourceStatesIndex, isDisplayTheme} from '../utils';
 import {logError, logWarn} from '../logger';
 import {applyTheme} from './utils';
@@ -86,6 +90,7 @@ class QipOptions {
     this.initAboutVersion();
     this.initWebStoreLink();
     await applyTheme(window);
+    await this.restoreOptions();
     await this.initSourceLists();
     await this.initVersionOptions();
     this.sortifyList();
@@ -101,6 +106,17 @@ class QipOptions {
         elm.addEventListener(listenerData.event, listenerData.callback);
       });
     });
+  }
+
+  /**
+   * Restore standard options
+   */
+  private async restoreOptions(): Promise<void> {
+    const theme = await getIndividualStorageData<typeof DisplayThemeSetting>(DisplayThemeSetting);
+    const themeEl = document.querySelector<HTMLSelectElement>('#theme');
+    if (themeEl) {
+      themeEl.value = theme;
+    }
   }
 
   /**
@@ -120,18 +136,14 @@ class QipOptions {
 
       const titleNode = clone.querySelector<HTMLParagraphElement>('.title');
       if (titleNode) {
-        titleNode.textContent += versionData.name;
+        titleNode.textContent = versionData.name;
       }
 
-      const dataSelectors = '.list-container,.enable-all,.sortable';
-      clone.querySelectorAll(dataSelectors).forEach((elm) => {
-        elm.setAttribute('data-version', version);
+      clone.querySelectorAll<HTMLElement>('.enable-all,.sortable').forEach((elm) => {
+        elm.dataset.version = version;
       });
 
-      const sourcesContainer = document.querySelector<HTMLDivElement>('#sources-container');
-      if (sourcesContainer) {
-        sourcesContainer.appendChild(clone);
-      }
+      document.querySelector<HTMLDivElement>('#sources-container')?.appendChild(clone);
 
       // Populate <ul> with sources
       const sources = await getOrderedSources(version);
@@ -165,20 +177,19 @@ class QipOptions {
 
     const clone = document.importNode(template.content, true);
 
-    const dataSelectors = 'li,.handle,input,a';
-    clone.querySelectorAll(dataSelectors).forEach((elm) => {
-      elm.setAttribute('data-version', version);
-      elm.setAttribute('data-id', source.id);
+    clone.querySelectorAll<HTMLElement>('li,input').forEach((elm) => {
+      elm.dataset.version = version;
+      elm.dataset.id = source.id;
     });
 
     if (source.enabled) {
-      const sourceInput = clone.querySelector('input');
+      const sourceInput = clone.querySelector<HTMLInputElement>('input');
       if (sourceInput) {
         sourceInput.checked = true;
       }
     }
 
-    const anchor = clone.querySelector('a');
+    const anchor = clone.querySelector<HTMLAnchorElement>('a');
     if (anchor) {
       anchor.href = source.url;
       anchor.textContent = source.name;
@@ -255,13 +266,13 @@ class QipOptions {
       const clone = document.importNode(template.content, true);
       const id = `version-state-${version}`;
 
-      const label = clone.querySelector('label');
+      const label = clone.querySelector<HTMLLabelElement>('label');
       if (label) {
         label.textContent = versionData.name;
         label.htmlFor = id;
       }
 
-      const input = clone.querySelector('input');
+      const input = clone.querySelector<HTMLInputElement>('input');
       if (input) {
         input.id = id;
         input.dataset.version = version;
@@ -289,12 +300,11 @@ class QipOptions {
    * @param event Event that triggered this handler
    */
   private enableAllSources(event: Event): void {
-    const target = event.currentTarget as HTMLButtonElement | null;
-    if (!target) {
+    if (!(event.currentTarget instanceof HTMLButtonElement)) {
       return;
     }
 
-    this.enableAllSourcesAsync(target).catch((error) => {
+    this.enableAllSourcesAsync(event.currentTarget).catch((error) => {
       logWarn('Unable to enable all sources\n', getErrorMessage(error));
     });
   }
@@ -306,7 +316,7 @@ class QipOptions {
   public async enableAllSourcesAsync(button: HTMLButtonElement): Promise<void> {
     const version = button.getAttribute('data-version') || '';
     const inputs = document.querySelectorAll<HTMLInputElement>(
-      '#sources-container input[data-version="' + version + '"]'
+      `#sources-container input[data-version="${version}"]`
     );
     inputs.forEach((input) => {
       input.checked = true;
@@ -356,12 +366,16 @@ class QipOptions {
    * Save all options to storage
    */
   private async saveOptionsAsync(): Promise<void> {
-    const options: Partial<StorageData> = {};
     let errorMessage = '';
+
+    // Prepare default storage data object and safely overlay options as they
+    // are validated.
+    const storageData = getDefaultStorageData();
 
     const theme = document.querySelector<HTMLSelectElement>('#theme')?.value;
     if (isDisplayTheme(theme)) {
-      options[DisplayThemeSetting] = theme;
+      storageData[DisplayThemeSetting] = theme;
+      // TODO: Should probably be moved outside of saveOptions().
       await applyTheme(window, theme);
     }
 
@@ -369,43 +383,39 @@ class QipOptions {
       const sourceOrder = this.getSourceOrder(version);
       const enabledSources = this.getEnabledSources(version);
       if (!enabledSources.length) {
-        const defaultSource = getDefaultSource(version);
-        const defaultId = defaultSource.id;
-        enabledSources.push(defaultId);
+        const {id, name} = getDefaultSource(version);
+        enabledSources.push(id);
 
         const input = document.querySelector<HTMLInputElement>(
-          `#sources-container input[data-version="${version}"][data-id="${defaultId}"]`
+          `#sources-container input[data-version="${version}"][data-id="${id}"]`
         );
         if (input) {
           input.checked = true;
         }
 
         if (!errorMessage) {
-          errorMessage =
-            'At least one source must be enabled for each IP version.' +
-            ` "${defaultSource.name}" has been automatically enabled.`;
+          errorMessage = `At least one source must be enabled for each IP version. ${name} has been automatically enabled.`;
         }
       }
 
-      const states: Partial<StorageSourceStates> = {};
       sourceOrder.forEach((id, index) => {
-        states[id] = {
-          order: index,
-          enabled: enabledSources.includes(id),
-        };
+        const storageSourceState = storageData[getStorageSourceStatesIndex(version)][id];
+        if (storageSourceState) {
+          storageSourceState.order = index;
+          storageSourceState.enabled = enabledSources.includes(id);
+        }
       });
-      options[getStorageSourceStatesIndex(version)] = states;
     }
 
     const versionInputs = document.querySelectorAll<HTMLInputElement>(
       '#version-states-container input:checked'
     );
     if (!versionInputs.length) {
-      const defaultVersion = getDefaultVersion();
-      const {name} = await getVersionData(defaultVersion);
+      const version = getDefaultVersion();
+      const {name} = getDefaultSourcesData()[version];
 
       const input = document.querySelector<HTMLInputElement>(
-        `#version-states-container input[data-version="${defaultVersion}"]`
+        `#version-states-container input[data-version="${version}"]`
       );
       if (input) {
         input.checked = true;
@@ -416,17 +426,14 @@ class QipOptions {
       }
     }
 
-    const versionStates: StorageVersionStates = {
-      [IpVersionIndex.V4]:
-        document.querySelector<HTMLInputElement>(
-          `#version-states-container input[data-version="${IpVersionIndex.V4}"]`
-        )?.checked ?? false,
-      [IpVersionIndex.V6]:
-        document.querySelector<HTMLInputElement>(
-          `#version-states-container input[data-version="${IpVersionIndex.V6}"]`
-        )?.checked ?? false,
-    };
-    options.version_states = versionStates;
+    for (const version of getVersions()) {
+      const versionInput = document.querySelector<HTMLInputElement>(
+        `#version-states-container input[data-version="${version}"]`
+      );
+      if (versionInput) {
+        storageData[VersionStatesIndex][version] = versionInput.checked;
+      }
+    }
 
     // Notify on error, but do not prevent options from saving since the issue
     // has been remedied.
@@ -434,7 +441,7 @@ class QipOptions {
       this.notify(errorMessage);
     }
 
-    await setOptions(options);
+    await setOptions(storageData);
   }
 
   /**

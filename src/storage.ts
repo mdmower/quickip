@@ -27,7 +27,7 @@ export async function getOption(name: string): Promise<unknown> {
  * @param names Option names
  */
 export async function getOptions(names?: string[]): Promise<Record<string, unknown>> {
-  return chrome.storage.sync.get(names || null);
+  return chrome.storage.sync.get(names);
 }
 
 /**
@@ -92,6 +92,11 @@ export function getDefaultStorageData(): StorageData {
  * @param keys Only retrieve the indicated storage keys and leave the remaining
  * settings at their defaults, reducing the amount of data that is requested
  * from the storage service.
+ *
+ * This is intentionally not exported because it could cause confusion about
+ * what can be trusted in the returned object. When `keys` is specified, only
+ * those settings can be trusted and the rest are at their default values. Use
+ * `getStorageData()` and `getIndividualStorageData()` instead.
  */
 async function getPartialStorageData(keys: Array<keyof StorageData>): Promise<StorageData> {
   const userStorageData = await getOptions(keys);
