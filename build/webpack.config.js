@@ -1,4 +1,5 @@
 const path = require('path');
+const purgecss = require('@fullhuman/postcss-purgecss');
 
 module.exports = {
   mode: 'production',
@@ -28,9 +29,16 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
-                plugins: function () {
-                  return [require('autoprefixer')];
-                },
+                plugins: [
+                  purgecss({
+                    content: [
+                      path.join(__dirname, '..', 'html', '*.html'),
+                      path.join(__dirname, '..', 'src', 'pages', '*.ts'),
+                      path.join(__dirname, '..', 'src', 'css', '*.scss'),
+                    ],
+                    safelist: [/^modal-/],
+                  }),
+                ],
               },
             },
           },
