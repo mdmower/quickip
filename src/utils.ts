@@ -37,11 +37,7 @@ export function getErrorMessage(error: unknown): string {
     return error.message;
   }
 
-  try {
-    return error.toString();
-  } catch (ex) {
-    return String(error);
-  }
+  return String(error);
 }
 
 /**

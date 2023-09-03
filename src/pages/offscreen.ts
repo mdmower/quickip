@@ -46,15 +46,19 @@ class QipOffscreen {
 
     switch (message.data.action) {
       case OffscreenAction.CopyIp:
-        this.copyIp(String(message.data.data)).finally(() => {
-          sendResponse({
-            cmd: MessageCmd.OffscreenDoc,
-            data: {
-              action: OffscreenAction.CopyIp,
-              data: '',
-            },
+        this.copyIp(String(message.data.data))
+          .catch((ex) => {
+            logError('Failed to copy IP to clipboard\n', getErrorMessage(ex));
+          })
+          .finally(() => {
+            sendResponse({
+              cmd: MessageCmd.OffscreenDoc,
+              data: {
+                action: OffscreenAction.CopyIp,
+                data: '',
+              },
+            });
           });
-        });
         break;
       default:
         break;
@@ -73,23 +77,19 @@ class QipOffscreen {
       return;
     }
 
-    try {
-      // https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/cookbook.offscreen-clipboard-write/offscreen.js#L52-L54
-      // The navigator.clipboard API requires that the window is focused, but
-      // offscreen documents cannot be focused. Fall back to old method.
-      // await navigator.clipboard.writeText(ip);
-      document.oncopy = function (event) {
-        if (event.clipboardData) {
-          event.clipboardData.setData('text/plain', ip);
-          event.preventDefault();
-        }
-      };
-      document.execCommand('copy', false, undefined);
+    // https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/cookbook.offscreen-clipboard-write/offscreen.js#L52-L54
+    // The navigator.clipboard API requires that the window is focused, but
+    // offscreen documents cannot be focused. Fall back to old method.
+    // await navigator.clipboard.writeText(ip);
+    document.oncopy = function (event) {
+      if (event.clipboardData) {
+        event.clipboardData.setData('text/plain', ip);
+        event.preventDefault();
+      }
+    };
+    document.execCommand('copy', false, undefined);
 
-      // Work around Chromium bug https://bugs.chromium.org/p/chromium/issues/detail?id=1377703
-      await new Promise((r) => setTimeout(r, 20));
-    } catch (ex) {
-      logError('Failed to copy IP to clipboard\n', getErrorMessage(ex));
-    }
+    // Work around Chromium bug https://bugs.chromium.org/p/chromium/issues/detail?id=1377703
+    return new Promise((r) => setTimeout(r, 20));
   }
 }
