@@ -12,45 +12,35 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.ts$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
       {
-        test: /\.(scss)$/,
+        test: /\.scss$/,
         use: [
-          {
-            loader: 'style-loader',
-          },
-          {
-            loader: 'css-loader',
-          },
+          'style-loader',
+          'css-loader',
           {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
                 plugins: [
                   purgecss({
-                    content: [
-                      path.join(__dirname, '..', 'html', '*.html'),
-                      path.join(__dirname, '..', 'src', 'pages', '*.ts'),
-                      path.join(__dirname, '..', 'src', 'css', '*.scss'),
-                    ],
+                    content: ['html/*.html', 'src/pages/*.ts', 'src/css/*.scss'],
                     safelist: [/^modal-/],
                   }),
                 ],
               },
             },
           },
-          {
-            loader: 'sass-loader',
-          },
+          'sass-loader',
         ],
       },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.ts', '.js'],
   },
   output: {
     filename: '[name].js',
