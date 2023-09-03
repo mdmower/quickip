@@ -1,6 +1,6 @@
 {
   "name": "quickip-chrome",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "An extension for Chrome to quickly find and copy your public IPv4 and IPv6 addresses",
   "private": true,
   "scripts": {
