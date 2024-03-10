@@ -1,13 +1,12 @@
 const path = require('path');
 const purgecss = require('@fullhuman/postcss-purgecss');
 
+/** @type {import('webpack').Configuration} */
 module.exports = {
   mode: 'production',
   entry: {
     bubble: path.resolve(__dirname, '..', 'src', 'pages', 'bubble.ts'),
     options: path.resolve(__dirname, '..', 'src', 'pages', 'options.ts'),
-    sw: path.resolve(__dirname, '..', 'src', 'sw.ts'),
-    offscreen: path.resolve(__dirname, '..', 'src', 'pages', 'offscreen.ts'),
   },
   module: {
     rules: [
@@ -46,4 +45,5 @@ module.exports = {
     filename: '[name].js',
     path: path.resolve(__dirname, '..', 'dist'),
   },
+  plugins: [],
 };

@@ -5,9 +5,6 @@
 const packageJson = require('../package.json');
 
 module.exports = {
-  background: {
-    service_worker: 'sw.js',
-  },
   action: {
     default_icon: {
       16: 'icons/icon16.png',
@@ -48,8 +45,7 @@ module.exports = {
   },
   manifest_version: 3,
   name: 'QuickIP',
-  options_page: 'options.html',
-  permissions: ['clipboardWrite', 'offscreen', 'storage'],
+  permissions: ['clipboardWrite', 'storage'],
   host_permissions: [
     'https://*.ipify.org/',
     'https://*.ident.me/',
