@@ -22,6 +22,7 @@ export async function getIp(version: IpVersionIndex): Promise<string | undefined
 
     try {
       const response = await fetch(url, {
+        credentials: 'omit',
         cache: 'no-store',
         signal: AbortSignal.timeout(fetchTimeout),
       });
