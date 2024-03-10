@@ -106,3 +106,4 @@ dist
 # Custom
 .vscode/
 pkg
+local.manifest.json
