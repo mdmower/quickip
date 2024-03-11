@@ -1,6 +1,10 @@
 # quickip-chrome
 
-Quickly find your IPv4 and IPv6 addresses. Available from the [Chrome Web Store](https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn) for Google Chrome and [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/quickip/dlkccijfhgebpigilcjllgbaiedopifj) for Microsoft Edge.
+Quickly find your IPv4 and IPv6 addresses. Available at:
+
+- [Chrome Web Store](https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn) for Google Chrome
+- [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/quickip/dlkccijfhgebpigilcjllgbaiedopifj) for Microsoft Edge
+- [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/{56f45803-b8a1-493c-b6e2-d915306e33eb}/) for Firefox
 
 ## Features
 
