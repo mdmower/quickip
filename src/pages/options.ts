@@ -252,7 +252,7 @@ class QipOptions {
           'https://microsoftedge.microsoft.com/addons/detail/quickip/dlkccijfhgebpigilcjllgbaiedopifj';
         text = 'Edge Add-ons';
       } else if (extensionId === '{56f45803-b8a1-493c-b6e2-d915306e33eb}') {
-        url = `https://addons.mozilla.org/firefox/addon/${encodeURI(extensionId)}/`;
+        url = `https://addons.mozilla.org/firefox/addon/quickip/`;
         text = 'Firefox Add-ons';
       }
 
