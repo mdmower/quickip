@@ -170,7 +170,7 @@ class QipBubble {
       return;
     }
 
-    logInfo(`copyIP: Contents: "${inputValue}"`);
+    logInfo(`copyIP: ${inputValue}`);
     navigator.clipboard.writeText(inputValue).catch((error) => {
       logError('Failed to copy IP to clipboard\n', getErrorMessage(error));
     });

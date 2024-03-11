@@ -29,6 +29,7 @@ import {
 import {getErrorMessage, getStorageSourceStatesIndex, isDisplayTheme} from '../utils';
 import {logError, logWarn} from '../logger';
 import {applyTheme} from './utils';
+import {qipBrowser} from '../global';
 
 document.addEventListener(
   'DOMContentLoaded',
@@ -72,7 +73,7 @@ class QipOptions {
       callback: this.enableAllSources.bind(this),
     },
     {
-      selector: '#keyboard-shortcut-config',
+      selector: '#edge-keyboard-shortcut-config,#chrome-keyboard-shortcut-config',
       event: 'click',
       callback: this.openShortcutsConfig.bind(this),
     },
@@ -88,6 +89,7 @@ class QipOptions {
    */
   public async init(): Promise<void> {
     this.initAboutVersion();
+    this.initKeyboardShortcutInfo();
     this.initWebStoreLink();
     await applyTheme(window);
     await this.restoreOptions();
@@ -209,6 +211,31 @@ class QipOptions {
   }
 
   /**
+   * Populate keyboard shortcut information
+   */
+  private initKeyboardShortcutInfo(): void {
+    const text =
+      qipBrowser === 'chrome'
+        ? 'chrome://extensions/shortcuts'
+        : qipBrowser === 'edge'
+          ? 'edge://extensions/shortcuts'
+          : qipBrowser === 'firefox'
+            ? 'about:addons'
+            : '';
+
+    if (text) {
+      const notice = document.getElementById(`${qipBrowser}-keyboard-shortcut-notice`);
+      if (notice) {
+        notice.classList.remove('d-none');
+      }
+      const config = document.getElementById(`${qipBrowser}-keyboard-shortcut-config`);
+      if (config) {
+        config.textContent = text;
+      }
+    }
+  }
+
+  /**
    * Add link to relevant web store
    */
   private initWebStoreLink(): void {
@@ -224,6 +251,9 @@ class QipOptions {
         url =
           'https://microsoftedge.microsoft.com/addons/detail/quickip/dlkccijfhgebpigilcjllgbaiedopifj';
         text = 'Edge Add-ons';
+      } else if (extensionId === '{56f45803-b8a1-493c-b6e2-d915306e33eb}') {
+        url = `https://addons.mozilla.org/firefox/addon/${encodeURI(extensionId)}/`;
+        text = 'Firefox Add-ons';
       }
 
       if (url && text) {
@@ -325,13 +355,25 @@ class QipOptions {
   }
 
   /**
-   * Handle link to extension shortcut options (<a> not allowed)
+   * Handle link to extension shortcut options (when <a> not allowed)
    * @param event Event that triggered this handler
    */
   private openShortcutsConfig(event: Event): void {
     event.preventDefault();
-    chrome.tabs.create({url: 'chrome://extensions/shortcuts'}).catch((error) => {
-      logWarn('Unable to open Chrome Shortcuts\n', getErrorMessage(error));
+
+    const url =
+      qipBrowser == 'chrome'
+        ? 'chrome://extensions/shortcuts'
+        : qipBrowser == 'edge'
+          ? 'edge://extensions/shortcuts'
+          : '';
+
+    if (!url) {
+      return;
+    }
+
+    chrome.tabs.create({url}).catch((error) => {
+      logWarn('Unable to open shortcuts configuration page\n', getErrorMessage(error));
     });
   }
 

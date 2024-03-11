@@ -1,12 +1,13 @@
 import {getIp} from './actions';
 import {IpVersionIndex} from './interfaces';
-import {logError} from './logger';
+import {logError, logWarn} from './logger';
 import {
   MessageCmd,
   OffscreenAction,
   OffscreenDocMessage,
   sendInternalMessageAsync,
 } from './messaging';
+import {copyIpBackground} from './pages/utils';
 import {getErrorMessage} from './utils';
 
 /**
@@ -24,12 +25,23 @@ export function handleCommand(command: string): void {
  * @param command Command ID
  */
 export async function asyncHandleCommand(command: string): Promise<void> {
+  const {permissions} = await chrome.permissions.getAll();
+  const needsOffscreen = !!permissions?.includes('offscreen');
+
   switch (command) {
     case 'quick-copy-ipv4':
-      await copyIpOffscreen(IpVersionIndex.V4);
+      if (needsOffscreen) {
+        await copyIpOffscreen(IpVersionIndex.V4);
+      } else {
+        await copyIpBackground(IpVersionIndex.V4);
+      }
       break;
     case 'quick-copy-ipv6':
-      await copyIpOffscreen(IpVersionIndex.V6);
+      if (needsOffscreen) {
+        await copyIpOffscreen(IpVersionIndex.V6);
+      } else {
+        await copyIpBackground(IpVersionIndex.V6);
+      }
       break;
     default:
       break;
@@ -41,9 +53,11 @@ export async function asyncHandleCommand(command: string): Promise<void> {
  * @param version IP version
  */
 async function copyIpOffscreen(version: IpVersionIndex): Promise<void> {
-  // If IP could not be found, copy an empty string to the clipboard as an
-  // indication that the command fired successfully.
-  const ip = (await getIp(version)) ?? '';
+  const ip = await getIp(version);
+  if (!ip) {
+    logWarn('copyIp: IP could not be determined, aborting.');
+    return;
+  }
 
   await chrome.offscreen.createDocument({
     justification: 'Shortcut command should copy an IP address to the clipboard',

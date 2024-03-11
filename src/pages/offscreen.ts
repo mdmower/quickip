@@ -2,7 +2,7 @@
  * @license Apache-2.0
  */
 
-import {logError} from '../logger';
+import {logError, logInfo, logWarn} from '../logger';
 import {MessageCmd, OffscreenAction, isOffscreenDocMessage} from '../messaging';
 import {getErrorMessage} from '../utils';
 
@@ -74,8 +74,10 @@ class QipOffscreen {
    */
   private async copyIp(ip: string): Promise<void> {
     if (!ip) {
+      logWarn('copyIp: IP could not be determined, aborting.');
       return;
     }
+    logInfo(`copyIP: ${ip}`);
 
     // https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/functional-samples/cookbook.offscreen-clipboard-write/offscreen.js#L52-L54
     // The navigator.clipboard API requires that the window is focused, but
