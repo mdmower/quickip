@@ -2,10 +2,7 @@
  * @license Apache-2.0
  */
 
-const manifestCommon = require('./manifest.common');
-
 module.exports = {
-  ...manifestCommon,
   background: {
     scripts: ['background.js'],
   },
