@@ -1,4 +1,4 @@
-# quickip-chrome
+# QuickIP
 
 Quickly find your IPv4 and IPv6 addresses. Available at:
 
@@ -34,4 +34,4 @@ Available npm scripts:
 
 Apache License, Version 2.0
 
-Copyright 2018 Matthew D. Mower
+Copyright 2018 Matthew D. Mower (mdmower)
