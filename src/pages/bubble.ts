@@ -61,11 +61,6 @@ class QipBubble {
         inputEl.dataset.version = version;
       }
 
-      const spanEl = clone.querySelector<HTMLSpanElement>('span');
-      if (spanEl) {
-        spanEl.dataset.version = version;
-      }
-
       const buttonEl = clone.querySelector<HTMLButtonElement>('button');
       if (buttonEl) {
         buttonEl.dataset.version = version;
@@ -99,12 +94,11 @@ class QipBubble {
       }
 
       const input = document.querySelector<HTMLInputElement>(`input[data-version="${version}"]`);
-      const span = document.querySelector<HTMLSpanElement>(`span[data-version="${version}"]`);
-      if (!input || !span) {
+      if (!input) {
         continue;
       }
 
-      this.insertIP(version, input, span).catch((error) => {
+      this.insertIP(version, input).catch((error) => {
         logError(`Failed to find and output IP${version}\n`, getErrorMessage(error));
       });
     }
@@ -114,35 +108,16 @@ class QipBubble {
    * Request an IP address for the given version and insert it into page
    * @param version IP version
    * @param input IP output element
-   * @param span Temporary sizing element
    */
-  private async insertIP(
-    version: IpVersionIndex,
-    input: HTMLInputElement,
-    span: HTMLSpanElement
-  ): Promise<void> {
+  private async insertIP(version: IpVersionIndex, input: HTMLInputElement): Promise<void> {
     const ip = await getIp(version);
     if (ip) {
       input.value = ip;
-      this.resizeBody(input, span);
+      input.style.minWidth = `${input.scrollWidth + 5}px`;
     } else {
       input.value = '';
       input.placeholder = 'Not found';
     }
-  }
-
-  /**
-   * Increase the size of the body if necessary to accomodate a long IP address
-   * @param input IP output element
-   * @param span Temporary sizing element
-   */
-  private resizeBody(input: HTMLInputElement, span: HTMLSpanElement): void {
-    input.hidden = true;
-    span.hidden = false;
-    span.textContent = input.value;
-    document.body.style.minWidth = `${document.body.offsetWidth + 5}px`;
-    span.remove();
-    input.hidden = false;
   }
 
   /**
