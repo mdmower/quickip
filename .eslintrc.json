@@ -1,6 +1,6 @@
 {
   "env": {
-    "es2020": true,
+    "es2022": true,
     "serviceworker": true
   },
   "parser": "@typescript-eslint/parser",
@@ -10,8 +10,8 @@
   },
   "plugins": ["@typescript-eslint", "jsdoc", "prettier"],
   "extends": [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
     "prettier",
     "plugin:jsdoc/recommended"
   ],
@@ -20,12 +20,7 @@
     "prettier/prettier": ["error"],
     "no-undef": "error",
     "no-var": "error",
-    "prefer-const": [
-      "error",
-      {
-        "destructuring": "all"
-      }
-    ],
+    "prefer-const": ["error", {"destructuring": "all"}],
     "@typescript-eslint/explicit-member-accessibility": [
       "error",
       {"overrides": {"constructors": "no-public"}}
