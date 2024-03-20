@@ -1,6 +1,6 @@
 # QuickIP
 
-Quickly find your IPv4 and IPv6 addresses. Available at:
+A browser extension to quickly find your IPv4 and IPv6 addresses. Available at:
 
 - [Chrome Web Store](https://chrome.google.com/webstore/detail/quickip/fminocopafmpcihgnilcacgjpcppacfn) for Google Chrome
 - [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/quickip/dlkccijfhgebpigilcjllgbaiedopifj) for Microsoft Edge
@@ -8,11 +8,15 @@ Quickly find your IPv4 and IPv6 addresses. Available at:
 
 ## Features
 
-1. Select which IP version(s) should be reported
-1. Select which resolvers should be used for each IP version
-1. Copy your IP to the clipboard with a keyboard shortcut (configurable)
+- Click the extension button to display your external IPv4 and/or IPv6 address
+- Copy your IP to the clipboard with a keyboard shortcut (configurable)
 
-## Build
+**Supported options:**
+
+- Select which IP version(s) should be reported
+- Select which resolvers should be used for each IP version
+
+## Development
 
 Clone git repository locally and then install npm packages
 
@@ -22,8 +26,8 @@ npm install
 
 Available npm scripts:
 
-- `npm run lint` - Lint your changes using eslint
-- `npm run format` - Use Prettier to format your changes
+- `npm run lint` - Lint source using eslint
+- `npm run format` - Format source using prettier
 - `npm run build [chrome|edge|firefox]` - Build the extension; output to `dist/<browser>/`
 - `npm run build-debug [chrome|edge|firefox]` - Build the extension without HTML/CSS minification and include source maps in transpiled JS; output to `dist/<browser>/`
 - `npm run pkg [chrome|edge|firefox]` - Compress built extension from `dist/<browser>/` into a `.zip` file and output to `pkg/`
