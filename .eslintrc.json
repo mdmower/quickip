@@ -15,7 +15,7 @@
     "prettier",
     "plugin:jsdoc/recommended"
   ],
-  "ignorePatterns": ["dist/**/*", "webpack.*.js"],
+  "ignorePatterns": ["dist/**/*"],
   "rules": {
     "prettier/prettier": ["error"],
     "no-undef": "error",

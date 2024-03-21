@@ -1,1 +1,5 @@
+dist/**
 package-lock.json
+pkg/**
+resources/**
+static/icons/**

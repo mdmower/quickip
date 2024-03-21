@@ -4,8 +4,8 @@
   "description": "An extension for Chrome to quickly find and copy your public IPv4 and IPv6 addresses",
   "private": true,
   "scripts": {
-    "lint": "eslint src build",
-    "format": "prettier --write \"build/**/*.js\" \"html/**/*.html\" \"src/**/*.(ts|scss|json)\" \"./*.json\"",
+    "lint": "eslint .",
+    "format": "prettier --write .",
     "build": "node build/dist.js",
     "build-debug": "node build/dist.js --debug",
     "pkg": "node build/pkg.js",
