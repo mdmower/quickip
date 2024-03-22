@@ -1,7 +1,7 @@
 {
-  "name": "quickip-chrome",
-  "version": "6.0.1",
-  "description": "An extension for Chrome to quickly find and copy your public IPv4 and IPv6 addresses",
+  "name": "quickip",
+  "version": "6.1.0",
+  "description": "A browser extension to quickly find your IPv4 and IPv6 addresses",
   "private": true,
   "scripts": {
     "lint": "eslint .",
@@ -12,22 +12,21 @@
     "clean": "node build/clean.js",
     "release": "npm run lint && npm run clean && npm run build && npm run pkg"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mdmower/quickip-chrome.git"
-  },
+  "repository": "github:mdmower/quickip",
   "keywords": [
     "ip",
+    "ipv4",
+    "ipv6",
     "quickip",
-    "chrome",
+    "addon",
     "extension"
   ],
   "author": "Matthew D. Mower <mdmower@cmphys.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/mdmower/quickip-chrome/issues"
+    "url": "https://github.com/mdmower/quickip/issues"
   },
-  "homepage": "https://github.com/mdmower/quickip-chrome#readme",
+  "homepage": "https://github.com/mdmower/quickip#readme",
   "dependencies": {
     "bootstrap": "^5.3.3",
     "is-ip": "^5.0.1",
