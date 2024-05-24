@@ -3,13 +3,14 @@
   "version": "6.1.1",
   "description": "A browser extension to quickly find your IPv4 and IPv6 addresses",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
-    "build": "node build/dist.js",
-    "build-debug": "node build/dist.js --debug",
-    "pkg": "node build/pkg.js",
-    "clean": "node build/clean.js",
+    "build": "vite-node build/dist.ts",
+    "build-debug": "vite-node build/dist.ts --debug",
+    "pkg": "vite-node build/pkg.ts",
+    "clean": "vite-node build/clean.ts",
     "release": "npm run lint && npm run clean && npm run build && npm run pkg"
   },
   "repository": "github:mdmower/quickip",
@@ -34,9 +35,13 @@
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^6.0.0",
+    "@types/archiver": "^6.0.2",
     "@types/bootstrap": "^5.2.10",
     "@types/chrome": "0.0.268",
-    "@types/node": "^18.19.33",
+    "@types/fs-extra": "^11.0.4",
+    "@types/html-minifier-terser": "^7.0.2",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.12.12",
     "@types/sortablejs": "^1.15.8",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "@typescript-eslint/parser": "^7.9.0",
@@ -58,6 +63,7 @@
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "5.4.5",
+    "vite-node": "^1.6.0",
     "webpack": "^5.91.0",
     "webpack-merge": "^5.10.0"
   }

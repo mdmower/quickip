@@ -2,9 +2,10 @@
  * @license Apache-2.0
  */
 
-const packageJson = require('../package.json');
+import deepmerge from 'deepmerge';
+import {version} from '../package.json';
 
-module.exports = {
+const common: chrome.runtime.ManifestV3 = {
   action: {
     default_icon: {
       16: 'icons/icon16.png',
@@ -52,5 +53,39 @@ module.exports = {
     'https://*.icanhazip.com/',
     'https://*.wtfismyip.com/',
   ],
-  version: packageJson.version,
+  version,
 };
+
+const chrome = deepmerge(common, {
+  background: {
+    service_worker: 'sw.js',
+  },
+  options_page: 'options.html',
+  permissions: ['offscreen'],
+});
+
+const edge = deepmerge(common, {
+  background: {
+    service_worker: 'sw.js',
+  },
+  options_page: 'options.html',
+  permissions: ['offscreen'],
+});
+
+const firefox = deepmerge(common, {
+  background: {
+    scripts: ['background.js'],
+  },
+  browser_specific_settings: {
+    gecko: {
+      id: '{56f45803-b8a1-493c-b6e2-d915306e33eb}',
+      strict_min_version: '115.0',
+    },
+  },
+  options_ui: {
+    page: 'options.html',
+    open_in_tab: true,
+  },
+});
+
+export const manifest = {chrome, edge, firefox};
