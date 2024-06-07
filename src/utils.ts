@@ -9,6 +9,14 @@ export function isRecord(val: unknown): val is Record<string, unknown> {
 }
 
 /**
+ * Determine whether a variable is a valid IpVersionIndex
+ * @param val Candidate value
+ */
+export function isIpVersionIndex(val: unknown): val is IpVersionIndex {
+  return typeof val === 'string' && Object.values<string>(IpVersionIndex).includes(val);
+}
+
+/**
  * Determine whether a variable is a valid DisplayTheme
  * @param val Candidate value
  */

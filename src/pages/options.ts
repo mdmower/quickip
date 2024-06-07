@@ -26,7 +26,12 @@ import {
   getIndividualStorageData,
   setOptions,
 } from '../storage';
-import {getErrorMessage, getStorageSourceStatesIndex, isDisplayTheme} from '../utils';
+import {
+  getErrorMessage,
+  getStorageSourceStatesIndex,
+  isDisplayTheme,
+  isIpVersionIndex,
+} from '../utils';
 import {logError, logWarn} from '../logger';
 import {applyTheme} from './utils';
 import {qipBrowser} from '../global';
@@ -84,6 +89,11 @@ class QipOptions {
     },
   ];
 
+  private sortableRef_: {
+    [IpVersionIndex.V4]?: Sortable;
+    [IpVersionIndex.V6]?: Sortable;
+  } = {};
+
   /**
    * Initialize options page
    */
@@ -107,6 +117,15 @@ class QipOptions {
       document.querySelectorAll(listenerData.selector).forEach((elm) => {
         elm.addEventListener(listenerData.event, listenerData.callback);
       });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (document.activeElement?.matches('.sortable li .handle')) {
+        const li = document.activeElement.closest('li');
+        if (li) {
+          this.sortListItem(event, li);
+        }
+      }
     });
   }
 
@@ -318,11 +337,59 @@ class QipOptions {
    */
   private sortifyList(): void {
     const sortableLists = document.querySelectorAll<HTMLUListElement>('ul.sortable');
-    sortableLists.forEach((list) => {
-      new Sortable(list, {
+    for (const list of Array.from(sortableLists)) {
+      const {version} = list.dataset;
+      if (!isIpVersionIndex(version)) {
+        continue;
+      }
+
+      this.sortableRef_[version] = new Sortable(list, {
         onUpdate: this.saveOptions.bind(this),
       });
-    });
+    }
+  }
+
+  /**
+   * Move sortable item by keypress
+   * @param event Keyboard event
+   * @param li Sortable list item
+   */
+  private sortListItem(event: KeyboardEvent, li: HTMLLIElement): void {
+    const {key} = event;
+    if (!['ArrowUp', 'ArrowDown'].includes(key)) {
+      return;
+    }
+
+    const {id, version} = li.dataset;
+    if (!id || !isIpVersionIndex(version)) {
+      return;
+    }
+
+    const sortable = this.sortableRef_[version];
+    if (!sortable) {
+      return;
+    }
+
+    const order = sortable.toArray();
+    const index = order.indexOf(id);
+    if (
+      index < 0 ||
+      (key === 'ArrowUp' && index === 0) ||
+      (key === 'ArrowDown' && index === order.length - 1)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    order.splice(index, 1);
+    if (key === 'ArrowDown') {
+      order.splice(index + 1, 0, id);
+    } else if (key == 'ArrowUp') {
+      order.splice(index - 1, 0, id);
+    }
+    sortable.sort(order);
+    sortable.el.querySelector<HTMLSpanElement>(`li[data-id="${id}"] .handle`)?.focus();
+    this.saveOptions();
   }
 
   /**
