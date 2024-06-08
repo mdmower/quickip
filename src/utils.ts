@@ -1,81 +1,52 @@
-import {DisplayTheme, IpVersionIndex, StorageSourceStatesIndex} from './interfaces';
+/**
+ * @license Apache-2.0
+ */
+
+import {getIp} from './lib/actions';
+import {DisplayTheme, DisplayThemeSetting, IpVersionIndex} from './lib/interfaces';
+import {logInfo, logWarn} from './lib/logger';
+import {getIndividualStorageData} from './lib/storage';
 
 /**
- * Determine whether a variable is a record-type object (excluding functions, arrays, and null)
- * @param val Candidate value
+ * Apply theme to page
+ * @param win Window
+ * @param theme Theme to apply
  */
-export function isRecord(val: unknown): val is Record<string, unknown> {
-  return typeof val === 'object' && !!val && !Array.isArray(val);
-}
-
-/**
- * Determine whether a variable is a valid IpVersionIndex
- * @param val Candidate value
- */
-export function isIpVersionIndex(val: unknown): val is IpVersionIndex {
-  return typeof val === 'string' && Object.values<string>(IpVersionIndex).includes(val);
-}
-
-/**
- * Determine whether a variable is a valid DisplayTheme
- * @param val Candidate value
- */
-export function isDisplayTheme(val: unknown): val is DisplayTheme {
-  return typeof val === 'string' && Object.values<string>(DisplayTheme).includes(val);
-}
-
-/**
- * Get typed object keys
- * @param obj Object with known key types
- */
-export function getTypedKeys<T extends object>(obj: T): Array<keyof T> {
-  return Object.keys(obj) as Array<keyof typeof obj>;
-}
-
-/**
- * Stringify an error
- * @param error Thrown error
- */
-export function getErrorMessage(error: unknown): string {
-  if (!error) {
-    return '';
+export async function applyTheme(win: Window, theme?: DisplayTheme): Promise<void> {
+  if (theme === undefined) {
+    theme = await getIndividualStorageData<typeof DisplayThemeSetting>(DisplayThemeSetting);
   }
 
-  if (error instanceof Error) {
-    return error.message;
+  if (
+    theme === DisplayTheme.Dark ||
+    (theme === DisplayTheme.System && win.matchMedia('(prefers-color-scheme: dark)').matches)
+  ) {
+    win.document.documentElement.setAttribute('data-bs-theme', DisplayTheme.Dark);
+  } else {
+    win.document.documentElement.setAttribute('data-bs-theme', DisplayTheme.Light);
   }
-
-  return String(error);
 }
 
 /**
- * Get IP version corresponding to a storage sources state index
- * @param sssi Storage sources state index
- */
-export function getIpVersionFromSSSI(sssi: StorageSourceStatesIndex): IpVersionIndex {
-  if (sssi === StorageSourceStatesIndex.V4) {
-    return IpVersionIndex.V4;
-  }
-  if (sssi === StorageSourceStatesIndex.V6) {
-    return IpVersionIndex.V6;
-  }
-  throw new Error(
-    `Could not identify IP version index from StorageSourceStatesIndex "${String(sssi)}"`
-  );
-}
-
-/**
- * Get storage sources state index corresponding to an IP version
+ * Find IP address and copy to clipboard in the background page
  * @param version IP version
  */
-export function getStorageSourceStatesIndex(version: IpVersionIndex): StorageSourceStatesIndex {
-  if (version === IpVersionIndex.V4) {
-    return StorageSourceStatesIndex.V4;
+export async function copyIpBackground(version: IpVersionIndex): Promise<void> {
+  const ip = await getIp(version);
+  if (!ip) {
+    logWarn('copyIp: IP could not be determined, aborting.');
+    return;
   }
-  if (version === IpVersionIndex.V6) {
-    return StorageSourceStatesIndex.V6;
-  }
-  throw new Error(
-    `Could not identify storage source states key from IP version "${String(version)}"`
-  );
+  logInfo(`copyIP: ${ip}`);
+
+  // The navigator.clipboard API requires that the window is focused, but
+  // background documents cannot be focused. Fall back to old method.
+  // await navigator.clipboard.writeText(ip);
+  document.oncopy = function (event) {
+    if (event.clipboardData) {
+      event.clipboardData.setData('text/plain', ip);
+      event.preventDefault();
+    }
+  };
+  document.execCommand('copy', false, undefined);
 }

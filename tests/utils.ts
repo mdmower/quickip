@@ -7,8 +7,13 @@ import puppeteer, {
   TargetType,
   WebWorker,
 } from 'puppeteer';
-import {DisplayTheme, IndividualSource, IpVersionIndex, StorageData} from '../src/interfaces.js';
-import defaultSources from '../src/default-sources.json';
+import {
+  DisplayTheme,
+  IndividualSource,
+  IpVersionIndex,
+  StorageData,
+} from '../src/lib/interfaces.js';
+import defaultSources from '../src/lib/default-sources.json';
 
 export const extensionPath = path.join(__dirname, '../dist/chrome');
 export const sampleIPv4 = '192.0.2.2';

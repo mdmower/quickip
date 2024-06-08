@@ -7,7 +7,7 @@ import {
   StorageSourceStates,
   StorageSourceStatesIndex,
   VersionStatesIndex,
-} from '../src/interfaces.js';
+} from '../src/lib/interfaces.js';
 
 describe('Options', () => {
   let browser: Browser;

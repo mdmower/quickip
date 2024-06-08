@@ -1,7 +1,6 @@
 {
   "env": {
-    "es2022": true,
-    "serviceworker": true
+    "es2022": true
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -44,6 +43,28 @@
     "jsdoc/require-returns-description": 0,
     "jsdoc/require-param-type": 0
   },
+  "overrides": [
+    {
+      "files": "src/[!sw]*.ts",
+      "env": {
+        "browser": true,
+        "serviceworker": false
+      }
+    },
+    {
+      "files": ["src/sw.ts", "src/lib/*.ts"],
+      "env": {
+        "browser": false,
+        "serviceworker": true
+      }
+    },
+    {
+      "files": ["postcss.config.js", "vite.config.ts"],
+      "parserOptions": {
+        "project": "tsconfig.dev.json"
+      }
+    }
+  ],
   "globals": {
     "chrome": "readonly"
   },

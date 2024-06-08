@@ -2,12 +2,12 @@
  * @license Apache-2.0
  */
 
-import '../css/bubble.scss';
-import {getIp} from '../actions';
-import {IpVersionIndex} from '../interfaces';
-import {logError, logInfo} from '../logger';
-import {getVersionData, getVersions} from '../sources';
-import {getErrorMessage} from '../utils';
+import './css/bubble.scss';
+import {getIp} from './lib/actions';
+import {IpVersionIndex} from './lib/interfaces';
+import {logError, logInfo} from './lib/logger';
+import {getVersionData, getVersions} from './lib/sources';
+import {getErrorMessage} from './lib/utils';
 import {applyTheme} from './utils';
 
 document.addEventListener(

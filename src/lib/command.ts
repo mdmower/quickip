@@ -7,7 +7,7 @@ import {
   OffscreenDocMessage,
   sendInternalMessageAsync,
 } from './messaging';
-import {copyIpBackground} from './pages/utils';
+import {copyIpBackground} from '../utils';
 import {getErrorMessage} from './utils';
 
 /**

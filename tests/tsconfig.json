@@ -8,6 +8,6 @@
     "types": ["node", "jest", "chrome"]
   },
   "extends": "../tsconfig.json",
-  "include": ["**/*", "../src/interfaces.ts", "../src/default-sources.json"],
+  "include": ["**/*", "../src/lib/interfaces.ts", "../src/lib/default-sources.json"],
   "exclude": ["node_modules"]
 }
