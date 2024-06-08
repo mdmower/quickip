@@ -7,10 +7,8 @@ export default {
     purgecss({
       contentFunction: (sourceFile) => {
         const name = path.basename(sourceFile).split('.')[0];
-        return [`src/${name}.html`, `src/${name}.ts`, `src/css/${name}.scss`];
+        return [`src/${name}.html`, `src/${name}.ts`, `src/utils.ts`, `src/css/${name}.scss`];
       },
-      // TODO: Limit to options.css only
-      safelist: [/^modal-/],
     }),
   ],
 };

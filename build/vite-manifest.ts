@@ -68,6 +68,7 @@ const manifest: Record<Browser, chrome.runtime.ManifestV3> = {
   chrome: deepmerge(common, {
     background: {
       service_worker: 'sw.js',
+      type: 'module',
     },
     options_page: 'options.html',
     permissions: ['offscreen'],
@@ -75,6 +76,7 @@ const manifest: Record<Browser, chrome.runtime.ManifestV3> = {
   edge: deepmerge(common, {
     background: {
       service_worker: 'sw.js',
+      type: 'module',
     },
     options_page: 'options.html',
     permissions: ['offscreen'],
@@ -82,6 +84,7 @@ const manifest: Record<Browser, chrome.runtime.ManifestV3> = {
   firefox: deepmerge(common, {
     background: {
       scripts: ['background.js'],
+      type: 'module',
     },
     browser_specific_settings: {
       gecko: {

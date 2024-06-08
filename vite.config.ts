@@ -10,8 +10,12 @@ export default defineConfig({
     },
   },
   plugins: [manifestPlugin(false, 'chrome')],
+  define: {
+    G_QIP_BROWSER: JSON.stringify('chrome'),
+  },
   publicDir: path.resolve(import.meta.dirname, 'static'),
   build: {
+    modulePreload: false,
     outDir: path.resolve(import.meta.dirname, 'dist/chrome'),
     emptyOutDir: true,
     rollupOptions: {
@@ -20,6 +24,11 @@ export default defineConfig({
         bubble: path.resolve(import.meta.dirname, 'src/bubble.html'),
         offscreen: path.resolve(import.meta.dirname, 'src/offscreen.html'),
         sw: path.resolve(import.meta.dirname, 'src/sw.ts'),
+      },
+      output: {
+        entryFileNames(chunkInfo) {
+          return chunkInfo.name + '.js';
+        },
       },
     },
   },
