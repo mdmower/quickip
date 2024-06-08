@@ -7,8 +7,12 @@ import puppeteer, {
   TargetType,
   WebWorker,
 } from 'puppeteer';
+import {DisplayTheme, IndividualSource, IpVersionIndex, StorageData} from '../src/interfaces.js';
+import defaultSources from '../src/default-sources.json';
 
 export const extensionPath = path.join(__dirname, '../dist/chrome');
+export const sampleIPv4 = '192.0.2.2';
+export const sampleIPv6 = '2001:DB8::2';
 
 export const puppeteerLaunchConfig: PuppeteerLaunchOptions = {
   headless: true,
@@ -63,4 +67,29 @@ export async function waitForWorker(worker: WebWorker): Promise<boolean> {
   }
 
   return ready;
+}
+
+export function getDefaultStorageData(): StorageData {
+  return {
+    theme: DisplayTheme.System,
+    version_states: {v4: true, v6: true},
+    source_states_v4: Object.values(defaultSources.v4.sources).reduce(
+      (prev, curr) => {
+        prev[curr.id] = {enabled: curr.enabled, order: curr.order};
+        return prev;
+      },
+      {} as StorageData['source_states_v4']
+    ),
+    source_states_v6: Object.values(defaultSources.v6.sources).reduce(
+      (prev, curr) => {
+        prev[curr.id] = {enabled: curr.enabled, order: curr.order};
+        return prev;
+      },
+      {} as StorageData['source_states_v6']
+    ),
+  };
+}
+
+export function getDefaultSources(version: IpVersionIndex): IndividualSource[] {
+  return Object.values(structuredClone(defaultSources)[version].sources);
 }
