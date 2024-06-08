@@ -2,7 +2,7 @@
  * @license Apache-2.0
  */
 
-import '../css/options.scss';
+import './css/options.scss';
 import 'bootstrap/js/dist/tab';
 import Modal from 'bootstrap/js/dist/modal';
 import Sortable from 'sortablejs';
@@ -11,7 +11,7 @@ import {
   IndividualSource,
   IpVersionIndex,
   VersionStatesIndex,
-} from '../interfaces';
+} from './lib/interfaces';
 import {
   getDefaultSource,
   getDefaultSourcesData,
@@ -19,22 +19,22 @@ import {
   getOrderedSources,
   getVersionData,
   getVersions,
-} from '../sources';
+} from './lib/sources';
 import {
   clearOptions,
   getDefaultStorageData,
   getIndividualStorageData,
   setOptions,
-} from '../storage';
+} from './lib/storage';
 import {
   getErrorMessage,
   getStorageSourceStatesIndex,
   isDisplayTheme,
   isIpVersionIndex,
-} from '../utils';
-import {logError, logWarn} from '../logger';
+} from './lib/utils';
+import {logError, logWarn} from './lib/logger';
 import {applyTheme} from './utils';
-import {qipBrowser} from '../global';
+import {qipBrowser} from './lib/global';
 
 document.addEventListener(
   'DOMContentLoaded',

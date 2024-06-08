@@ -19,6 +19,15 @@
           <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
           <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
         </symbol>
+        <symbol id="app-logo" viewBox="0 0 135.47 135.47">
+          <g transform="translate(0 -161.53)">
+            <rect y="161.53" width="135.47" height="135.47" rx="12.214" ry="12.214" fill="#428bff" stroke-width=".2776"/>
+            <g fill="#fff" stroke-width=".26458" aria-label="IP">
+              <path d="m24.952 192.97h13.335v73.342h-13.335z" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal"/>
+              <path d="m77.495 192.22q15.981 0 24.448 5.8208 8.5725 5.8208 8.5725 18.203 0 6.4558-2.3283 11.112-2.2225 4.5508-6.5617 7.5142-4.3392 2.8575-10.583 4.2333-6.2442 1.3758-14.288 1.3758h-6.6675v25.823h-13.335v-72.284q4.6567-1.0583 10.266-1.3758 5.715-0.42334 10.478-0.42334zm0.9525 11.536q-5.08 0-8.3608 0.3175v24.977h6.4558q9.6308 0 14.817-2.6458 5.1858-2.7517 5.1858-10.266 0-3.5983-1.3758-6.0325-1.3758-2.4342-3.81-3.81-2.4342-1.3758-5.8208-1.905-3.2808-0.635-7.0908-0.635z" style="font-feature-settings:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal"/>
+            </g>
+          </g>
+        </symbol>
       </defs>
     </svg>
 
@@ -158,7 +167,11 @@
           aria-labelledby="pills-about-tab"
         >
           <div class="row mt-5 mb-3 justify-content-md-center">
-            <img class="col-md-2" src="icons/icon-vector.svg" />
+            <div class="col-md-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-100 h-100" fill="currentColor">
+                <use xlink:href="#app-logo"></use>
+              </svg>
+            </div>
           </div>
           <p id="optionsVersion">Version <span id="extensionVersion"></span></p>
           <p id="optionsDisclaimer">

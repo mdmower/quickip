@@ -2,9 +2,9 @@
  * @license Apache-2.0
  */
 
-import {logError, logInfo, logWarn} from '../logger';
-import {MessageCmd, OffscreenAction, isOffscreenDocMessage} from '../messaging';
-import {getErrorMessage} from '../utils';
+import {logError, logInfo, logWarn} from './lib/logger';
+import {MessageCmd, OffscreenAction, isOffscreenDocMessage} from './lib/messaging';
+import {getErrorMessage} from './lib/utils';
 
 document.addEventListener(
   'DOMContentLoaded',

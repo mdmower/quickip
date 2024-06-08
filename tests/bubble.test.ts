@@ -12,7 +12,7 @@ import {
   DisplayThemeSetting,
   IpVersionIndex,
   VersionStatesIndex,
-} from '../src/interfaces.js';
+} from '../src/lib/interfaces.js';
 
 describe('Bubble', () => {
   let browser: Browser;

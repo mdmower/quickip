@@ -23,7 +23,7 @@ const {readdir, copyFile, readFile, writeFile, copy, existsSync, mkdirSync} = fs
  */
 async function minifyHtml(debug: boolean, browser: Browser): Promise<void> {
   try {
-    const filenames = await readdir(dirRef.html);
+    const filenames = await readdir(dirRef.src);
     const htmlFiles = filenames
       .filter(
         (filename) =>
@@ -32,7 +32,7 @@ async function minifyHtml(debug: boolean, browser: Browser): Promise<void> {
       )
       .map((filename) => ({
         filename,
-        inputPath: path.join(dirRef.html, filename),
+        inputPath: path.join(dirRef.src, filename),
         outputPath: path.join(dirRef.dist, browser, filename),
       }));
 
