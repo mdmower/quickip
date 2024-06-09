@@ -2,7 +2,6 @@
  * @license Apache-2.0
  */
 
-import './css/bubble.scss';
 import {getIp} from './lib/actions';
 import {IpVersionIndex} from './lib/interfaces';
 import {logError, logInfo} from './lib/logger';

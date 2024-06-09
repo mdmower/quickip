@@ -2,7 +2,6 @@
  * @license Apache-2.0
  */
 
-import './css/options.scss';
 import 'bootstrap/js/dist/tab';
 import Modal from 'bootstrap/js/dist/modal';
 import Sortable from 'sortablejs';

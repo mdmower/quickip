@@ -3,95 +3,15 @@
  */
 
 import path from 'node:path';
-import fse from 'fs-extra';
-import {minify} from 'html-minifier-terser';
+import {mkdir, writeFile} from 'node:fs/promises';
 import webpack from 'webpack';
 import minimist from 'minimist';
 import colors from 'colors';
-import deepmerge from 'deepmerge';
-import {webpackConfig} from './webpack.js';
-import {manifest} from './manifest.js';
+import {getWebpackConfig} from './webpack.js';
+import {getManifest} from './manifest.js';
 import {Browser, browsers, dirRef} from './utils.js';
 
 const {bold} = colors;
-const {readdir, copyFile, readFile, writeFile, copy, existsSync, mkdirSync} = fse;
-
-/**
- * Minify HTML
- * @param debug Whether to run in debug mode
- * @param browser Target browser
- */
-async function minifyHtml(debug: boolean, browser: Browser): Promise<void> {
-  try {
-    const filenames = await readdir(dirRef.src);
-    const htmlFiles = filenames
-      .filter(
-        (filename) =>
-          /\.html?$/i.test(filename) &&
-          (browser !== 'firefox' || !['offscreen.html'].includes(filename))
-      )
-      .map((filename) => ({
-        filename,
-        inputPath: path.join(dirRef.src, filename),
-        outputPath: path.join(dirRef.dist, browser, filename),
-      }));
-
-    if (debug) {
-      console.log(`${bold.green('[Copying HTML]')} ${filenames.join(', ')}`);
-      await Promise.all(htmlFiles.map((file) => copyFile(file.inputPath, file.outputPath)));
-      return;
-    }
-
-    console.log(`${bold.green('[Minifying HTML]')} ${filenames.join(', ')}`);
-    await Promise.all(
-      htmlFiles.map(async (file) => {
-        const html = await readFile(file.inputPath, 'utf-8');
-        const minHtml = await minify(html, {
-          collapseBooleanAttributes: true,
-          collapseWhitespace: true,
-          conservativeCollapse: true,
-          decodeEntities: true,
-          removeComments: true,
-        });
-
-        return writeFile(file.outputPath, minHtml, 'utf-8');
-      })
-    );
-  } catch (ex) {
-    console.error(bold.red(`[Build error] Unexpected error in ${minifyHtml.name}`));
-    if (ex) {
-      console.error(ex);
-    }
-    return Promise.reject();
-  }
-}
-
-/**
- * Copy static files
- * @param debug Whether to run in debug mode
- * @param browser Target browser
- */
-async function copyStaticFiles(debug: boolean, browser: string): Promise<void> {
-  try {
-    const filenames = await readdir(dirRef.static);
-    const staticFiles = filenames.map((filename) => {
-      return {
-        filename,
-        inputPath: path.join(dirRef.static, filename),
-        outputPath: path.join(dirRef.dist, browser, filename),
-      };
-    });
-
-    console.log(`${bold.green('[Copying static files]')} ${filenames.join(', ')}`);
-    await Promise.all(staticFiles.map((file) => copy(file.inputPath, file.outputPath)));
-  } catch (ex) {
-    console.error(bold.red(`[Build error] Unexpected error in ${copyStaticFiles.name}`));
-    if (ex) {
-      console.error(ex);
-    }
-    return Promise.reject();
-  }
-}
 
 /**
  * Write manifest.json
@@ -100,22 +20,8 @@ async function copyStaticFiles(debug: boolean, browser: string): Promise<void> {
  */
 async function writeManifest(debug: boolean, browser: Browser): Promise<void> {
   try {
-    let manifestObj = manifest[browser];
-
-    // If local.manifest.json exists and this is a debug build, merge into manifest.
-    if (debug) {
-      const localManifestPath = path.join(dirRef.root, 'local.manifest.json');
-      if (existsSync(localManifestPath)) {
-        const localManifestJson = await readFile(localManifestPath, 'utf-8');
-        const localManifestObj = JSON.parse(localManifestJson) as chrome.runtime.ManifestV3;
-        if (browser == 'firefox' && 'key' in localManifestObj) {
-          delete localManifestObj.key;
-        }
-        manifestObj = deepmerge(manifestObj, localManifestObj);
-      }
-    }
-
-    const manifestJson = JSON.stringify(manifestObj, undefined, debug ? 2 : undefined);
+    const manifest = await getManifest(debug, browser);
+    const manifestJson = JSON.stringify(manifest, undefined, debug ? 2 : undefined);
     const mainfestPath = path.join(dirRef.dist, browser, 'manifest.json');
     console.log(`${bold.green('[Writing manifest]')} manifest.json`);
     await writeFile(mainfestPath, manifestJson, 'utf-8');
@@ -129,24 +35,13 @@ async function writeManifest(debug: boolean, browser: Browser): Promise<void> {
 }
 
 /**
- * Compile JS for browser target
+ * Compile source for browser target
  * @param debug Whether to run in debug mode
  * @param browser Target browser
  */
 async function compileJs(debug: boolean, browser: Browser): Promise<void> {
   try {
-    const config = webpackConfig[browser];
-    config.output ||= {};
-    config.output.path = path.join(dirRef.dist, browser);
-
-    if (debug) {
-      config.mode = 'development';
-      config.devtool = 'inline-source-map';
-    }
-
-    config.entry ||= {};
-    const filenames = Object.keys(config.entry).map((entry) => `${entry}.js`);
-    console.log(`${bold.green('[Compiling JS]')} ${filenames.join(', ')}\n`);
+    const config = getWebpackConfig(debug, browser);
     const compiler = webpack(config);
     await new Promise<void>((resolve, reject) => {
       compiler.run((err, stats) => {
@@ -208,7 +103,7 @@ async function compileJs(debug: boolean, browser: Browser): Promise<void> {
 
     // Prepare output directories
     for (const browser of filteredBrowsers) {
-      mkdirSync(path.join(dirRef.dist, browser), {recursive: true});
+      await mkdir(path.join(dirRef.dist, browser), {recursive: true});
     }
   } catch (ex) {
     console.error(bold.red('[Build error] Unexpected error preparing for build'));
@@ -222,12 +117,7 @@ async function compileJs(debug: boolean, browser: Browser): Promise<void> {
   try {
     for (const browser of filteredBrowsers) {
       console.log(`\n${bold.cyan('Building for ' + browser)}`);
-      await Promise.all([
-        minifyHtml(debug, browser),
-        copyStaticFiles(debug, browser),
-        writeManifest(debug, browser),
-      ]);
-      // Keep compilation logs together by calling compileJs independently
+      await writeManifest(debug, browser);
       await compileJs(debug, browser);
 
       console.log(`\n${bold.green('[Build successful]')} ${browser}`);
