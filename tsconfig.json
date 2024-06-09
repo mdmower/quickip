@@ -5,6 +5,7 @@
     "moduleResolution": "Bundler",
     "target": "ES2022",
     "strict": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "outDir": "dist",
