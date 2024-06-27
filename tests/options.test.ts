@@ -175,6 +175,34 @@ describe('Options', () => {
     }
   });
 
+  it('should enable all sources', async () => {
+    for (const version of [IpVersionIndex.V4, IpVersionIndex.V6]) {
+      const initialPageStatuses = await getPageSourceStatuses(version);
+      expect(initialPageStatuses.length).toBeGreaterThan(2);
+      expect(initialPageStatuses.every(({enabled}) => enabled)).toBe(true);
+
+      const $inputs = await page.$$(`input.source-checkbox[data-version="${version}"]`);
+      const $button = await page.$(`button.enable-all[data-version="${version}"]`);
+      const storageKey =
+        version == IpVersionIndex.V4 ? StorageSourceStatesIndex.V4 : StorageSourceStatesIndex.V6;
+
+      await $inputs[0].click();
+      await $inputs[1].click();
+      await $button?.click();
+      const updatedPageStatuses = await getPageSourceStatuses(version);
+      expect(updatedPageStatuses.map(({enabled}) => enabled)).toEqual(
+        initialPageStatuses.map(({enabled}) => enabled)
+      );
+
+      const storage = await page.evaluate((s) => chrome.storage.sync.get(s), storageKey);
+      const storageValue = storage[storageKey] as StorageSourceStates;
+      const expectedStatuses = Object.entries(storageValue)
+        .map(([id, status]) => ({id, ...status}))
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      expect(updatedPageStatuses).toEqual(expectedStatuses);
+    }
+  });
+
   it('should reorder sources', async () => {
     for (const version of [IpVersionIndex.V4, IpVersionIndex.V6]) {
       const initialPageStatuses = await getPageSourceStatuses(version);
