@@ -55,12 +55,19 @@ export function getWebpackConfig(debug: boolean, browser: Browser): Configuratio
                     (purgecss as unknown as typeof purgecss.default)({
                       contentFunction: (sourceFile) => {
                         const name = path.basename(sourceFile).split('.')[0];
-                        return [
+                        const sources = [
                           `src/${name}.html`,
                           `src/${name}.ts`,
                           `src/utils.ts`,
                           `src/css/${name}.scss`,
                         ];
+                        if (name === 'options') {
+                          sources.push(
+                            'node_modules/bootstrap/js/dist/modal.js',
+                            'node_modules/bootstrap/js/dist/tab.js'
+                          );
+                        }
+                        return sources;
                       },
                       safelist: [/^modal-/],
                     }),
