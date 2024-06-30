@@ -39,7 +39,7 @@ async function writeManifest(debug: boolean, browser: Browser): Promise<void> {
  * @param debug Whether to run in debug mode
  * @param browser Target browser
  */
-async function compileJs(debug: boolean, browser: Browser): Promise<void> {
+async function runWebpack(debug: boolean, browser: Browser): Promise<void> {
   try {
     const config = getWebpackConfig(debug, browser);
     const compiler = webpack(config);
@@ -69,7 +69,7 @@ async function compileJs(debug: boolean, browser: Browser): Promise<void> {
       });
     });
   } catch (ex) {
-    console.error(bold.red(`[Build error] Compilation error in ${compileJs.name}`));
+    console.error(bold.red(`[Build error] Compilation error in ${runWebpack.name}`));
     if (ex) {
       console.error(ex);
     }
@@ -118,7 +118,7 @@ async function compileJs(debug: boolean, browser: Browser): Promise<void> {
     for (const browser of filteredBrowsers) {
       console.log(`\n${bold.cyan('Building for ' + browser)}`);
       await writeManifest(debug, browser);
-      await compileJs(debug, browser);
+      await runWebpack(debug, browser);
 
       console.log(`\n${bold.green('[Build successful]')} ${browser}`);
     }

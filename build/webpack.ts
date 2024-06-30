@@ -18,17 +18,17 @@ import CopyPlugin from 'copy-webpack-plugin';
 export function getWebpackConfig(debug: boolean, browser: Browser): Configuration {
   const entry: Configuration['entry'] = {};
   if (browser !== 'firefox') {
-    entry.sw = path.resolve(dirRef.root, 'src/sw.ts');
+    entry.sw = path.resolve(dirRef.src, 'sw.ts');
   } else if (browser === 'firefox') {
-    entry.background = path.resolve(dirRef.root, 'src/background.ts');
+    entry.background = path.resolve(dirRef.src, 'background.ts');
   }
 
   const htmlEntry: HtmlBundlerPlugin.PluginOptions['entry'] = {
-    bubble: path.resolve(dirRef.root, 'src/bubble.html'),
-    options: path.resolve(dirRef.root, 'src/options.html'),
+    bubble: path.resolve(dirRef.src, 'bubble.html'),
+    options: path.resolve(dirRef.src, 'options.html'),
   };
   if (browser !== 'firefox') {
-    htmlEntry.offscreen = path.resolve(dirRef.root, 'src/offscreen.html');
+    htmlEntry.offscreen = path.resolve(dirRef.src, 'offscreen.html');
   }
 
   return {
@@ -92,6 +92,7 @@ export function getWebpackConfig(debug: boolean, browser: Browser): Configuratio
     },
     output: {
       filename: '[name].js',
+      chunkFilename: '[name].chunk.js',
       path: path.join(dirRef.dist, browser),
     },
     plugins: [
