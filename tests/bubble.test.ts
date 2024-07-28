@@ -1,4 +1,4 @@
-import {Browser, BrowserContext, HTTPRequest, Page, WebWorker} from 'puppeteer';
+import {Browser, BrowserContext, HTTPRequest, Page, TargetType, WebWorker} from 'puppeteer';
 import {isIP, isIPv4, isIPv6} from 'node:net';
 import {
   getDefaultSources,
@@ -28,7 +28,7 @@ describe('Bubble', () => {
     const isSource4 = source4Urls.some((url) => request.url() === url);
     const isSource6 = !isSource4 && source6Urls.some((url) => request.url() === url);
     if (!isSource4 && !isSource6) {
-      request.continue();
+      void request.continue();
       return;
     }
 
@@ -43,10 +43,10 @@ describe('Bubble', () => {
 
     if (delayMs) {
       setTimeout(() => {
-        request.respond(response);
+        void request.respond(response);
       }, delayMs);
     } else {
-      request.respond(response);
+      void request.respond(response);
     }
   };
 
@@ -60,10 +60,10 @@ describe('Bubble', () => {
     await worker.evaluate(() => chrome.action.openPopup());
 
     const bubbleTarget = await browser.waitForTarget(
-      (target) => target.type() === 'page' && target.url().endsWith('bubble.html')
+      (target) => target.type() === TargetType.PAGE && target.url().endsWith('bubble.html')
     );
     page = await bubbleTarget.asPage();
-    page.setRequestInterception(true);
+    await page.setRequestInterception(true);
     page.on('request', mockRequestHandler);
     await page.evaluate(() => navigator.clipboard.writeText(''));
   });
@@ -148,7 +148,7 @@ describe('Bubble', () => {
 
   it('should focus first copy button', async () => {
     await page.waitForNetworkIdle();
-    page.keyboard.type(' ');
+    await page.keyboard.type(' ');
 
     const ip = await page.$eval('input', (input) => input.value);
     expect(isIPv4(ip)).toBe(true);
@@ -230,7 +230,7 @@ describe('Bubble', () => {
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should get valid IPs from all sources', async () => {
     page.off('request', mockRequestHandler);
-    page.setRequestInterception(false);
+    await page.setRequestInterception(false);
 
     const settings = getDefaultStorageData();
     const sources4 = getDefaultSources(IpVersionIndex.V4).sort((a, b) => a.order - b.order);

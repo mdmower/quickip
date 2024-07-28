@@ -1,4 +1,4 @@
-import {Browser, ElementHandle, Page, WebWorker} from 'puppeteer';
+import {Browser, ElementHandle, Page, TargetType, WebWorker} from 'puppeteer';
 import {getDefaultStorageData, launchBrowser} from './utils.js';
 import {
   DisplayTheme,
@@ -35,7 +35,7 @@ describe('Options', () => {
     await worker.evaluate(() => chrome.runtime.openOptionsPage());
 
     const optionsTarget = await browser.waitForTarget(
-      (target) => target.type() === 'page' && target.url().endsWith('options.html')
+      (target) => target.type() === TargetType.PAGE && target.url().endsWith('options.html')
     );
     const optionsPage = await optionsTarget.page();
     if (!optionsPage) {
