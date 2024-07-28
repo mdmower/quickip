@@ -98,7 +98,7 @@ export function getDefaultStorageData(): StorageData {
  * those settings can be trusted and the rest are at their default values. Use
  * `getStorageData()` and `getIndividualStorageData()` instead.
  */
-async function getPartialStorageData(keys: Array<keyof StorageData>): Promise<StorageData> {
+async function getPartialStorageData(keys: (keyof StorageData)[]): Promise<StorageData> {
   const userStorageData = await getOptions(keys);
   if (!isRecord(userStorageData) || !Object.keys(userStorageData).length) {
     return getDefaultStorageData();

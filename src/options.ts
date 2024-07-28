@@ -55,7 +55,7 @@ class QipOptions {
   /**
    * Collection of options listeners
    */
-  private listenerMap_: Array<ListenerConfig> = [
+  private listenerMap_: ListenerConfig[] = [
     {
       selector: '#theme',
       event: 'change',

@@ -85,9 +85,7 @@ export interface IndividualStorageSourceState {
 /**
  * Collection of information about all sources in Chrome storage for a specific IP version
  */
-export interface StorageSourceStates {
-  [source_id: string]: IndividualStorageSourceState | undefined;
-}
+export type StorageSourceStates = Record<string, IndividualStorageSourceState | undefined>;
 
 /**
  * Data in Chrome storage

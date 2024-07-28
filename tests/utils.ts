@@ -59,10 +59,7 @@ export async function waitForWorker(worker: WebWorker): Promise<boolean> {
 
   for (let i = 0; i < 10; i++) {
     ready = await worker.evaluate(
-      () =>
-        typeof chrome !== 'undefined' &&
-        typeof chrome.action !== 'undefined' &&
-        typeof chrome.action.openPopup !== 'undefined'
+      () => typeof chrome !== 'undefined' && !!chrome.action?.openPopup
     );
     if (!ready) {
       await new Promise((resolve) => setTimeout(resolve, 25));
