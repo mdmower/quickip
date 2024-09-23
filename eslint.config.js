@@ -6,6 +6,7 @@ import tseslint from 'typescript-eslint';
 import jsdoc from 'eslint-plugin-jsdoc';
 import jest from 'eslint-plugin-jest';
 import prettierConfigRecommended from 'eslint-plugin-prettier/recommended';
+import noUnsanitized from 'eslint-plugin-no-unsanitized';
 
 export default tseslint.config(
   {
@@ -43,7 +44,7 @@ export default tseslint.config(
       '@typescript-eslint/prefer-nullish-coalescing': 'off',
     },
   },
-  jsdoc.configs['flat/recommended'],
+  jsdoc.configs['flat/recommended-typescript'],
   {
     files: ['**/*.ts'],
     plugins: {jsdoc},
@@ -72,6 +73,7 @@ export default tseslint.config(
       'jsdoc/require-jsdoc': 'off',
     },
   },
+  ...noUnsanitized.configs.recommended,
   {
     files: ['src/**/*.ts', 'tests/**/*.ts'],
     languageOptions: {
