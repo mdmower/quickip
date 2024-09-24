@@ -101,6 +101,10 @@ export default tseslint.config(
   },
   {
     files: ['tests/**/*.ts'],
+    ...jest.configs['flat/recommended'],
+  },
+  {
+    files: ['tests/**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.jest,
@@ -108,7 +112,6 @@ export default tseslint.config(
         ...globals.browser,
       },
     },
-    ...jest.configs['flat/recommended'],
   },
   prettierConfigRecommended
 );
