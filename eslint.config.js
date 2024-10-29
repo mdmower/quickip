@@ -73,7 +73,7 @@ export default tseslint.config(
       'jsdoc/require-jsdoc': 'off',
     },
   },
-  ...noUnsanitized.configs.recommended,
+  noUnsanitized.configs.recommended,
   {
     files: ['src/**/*.ts', 'tests/**/*.ts'],
     languageOptions: {
