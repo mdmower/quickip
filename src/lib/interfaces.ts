@@ -63,16 +63,12 @@ export interface IPvxSourceData {
 /**
  * Collection of information about all sources for all IP versions
  */
-export type SourceData = {
-  [version in IpVersionIndex]: IPvxSourceData;
-};
+export type SourceData = Record<IpVersionIndex, IPvxSourceData>;
 
 /**
  * IP version states in Chrome storage
  */
-export type StorageVersionStates = {
-  [version in IpVersionIndex]: boolean;
-};
+export type StorageVersionStates = Record<IpVersionIndex, boolean>;
 
 /**
  * Information about an individual source in Chrome storage
@@ -93,6 +89,4 @@ export type StorageSourceStates = Record<string, IndividualStorageSourceState | 
 export type StorageData = {
   [DisplayThemeSetting]: DisplayTheme;
   [VersionStatesIndex]: StorageVersionStates;
-} & {
-  [name in StorageSourceStatesIndex]: StorageSourceStates;
-};
+} & Record<StorageSourceStatesIndex, StorageSourceStates>;

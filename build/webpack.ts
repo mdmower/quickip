@@ -75,7 +75,17 @@ export function getWebpackConfig(debug: boolean, browser: Browser): Configuratio
                 },
               },
             },
-            'sass-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                sassOptions: {
+                  // Silence deprecations in bootstrap 5.3 SCSS
+                  // https://github.com/twbs/bootstrap/issues/40962
+                  quietDeps: true,
+                  silenceDeprecations: ['import'],
+                },
+              },
+            },
           ],
         },
         {

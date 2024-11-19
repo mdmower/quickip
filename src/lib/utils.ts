@@ -45,7 +45,7 @@ export function getErrorMessage(error: unknown): string {
     return error.message;
   }
 
-  return String(error);
+  return JSON.stringify(error);
 }
 
 /**
