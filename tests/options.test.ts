@@ -1,5 +1,5 @@
 import {Browser, ElementHandle, Page, TargetType, WebWorker} from 'puppeteer';
-import {getDefaultStorageData, launchBrowser} from './utils.js';
+import {getDefaultStorageData, launchBrowser} from './utils';
 import {
   DisplayTheme,
   DisplayThemeSetting,
@@ -7,7 +7,7 @@ import {
   StorageSourceStates,
   StorageSourceStatesIndex,
   VersionStatesIndex,
-} from '../src/lib/interfaces.js';
+} from '../src/lib/interfaces';
 
 describe('Options', () => {
   let browser: Browser;

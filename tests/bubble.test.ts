@@ -6,13 +6,13 @@ import {
   launchBrowser,
   sampleIPv4,
   sampleIPv6,
-} from './utils.js';
+} from './utils';
 import {
   DisplayTheme,
   DisplayThemeSetting,
   IpVersionIndex,
   VersionStatesIndex,
-} from '../src/lib/interfaces.js';
+} from '../src/lib/interfaces';
 
 describe('Bubble', () => {
   let browser: Browser;

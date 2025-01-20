@@ -1,25 +1,14 @@
 import path from 'node:path';
 import {existsSync} from 'node:fs';
-import puppeteer, {
-  Browser,
-  BrowserContext,
-  PuppeteerLaunchOptions,
-  TargetType,
-  WebWorker,
-} from 'puppeteer';
-import {
-  DisplayTheme,
-  IndividualSource,
-  IpVersionIndex,
-  StorageData,
-} from '../src/lib/interfaces.js';
+import puppeteer, {Browser, BrowserContext, TargetType, WebWorker} from 'puppeteer';
+import {DisplayTheme, IndividualSource, IpVersionIndex, StorageData} from '../src/lib/interfaces';
 import defaultSources from '../src/lib/default-sources.json';
 
 export const extensionPath = path.join(__dirname, '../dist/chrome');
 export const sampleIPv4 = '192.0.2.2';
 export const sampleIPv6 = '2001:DB8::2';
 
-export const puppeteerLaunchConfig: PuppeteerLaunchOptions = {
+export const puppeteerLaunchConfig: Parameters<typeof puppeteer.launch>[0] = {
   headless: true,
   args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
 };

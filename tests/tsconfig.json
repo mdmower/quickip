@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "sourceMap": true,
     "types": ["node", "jest", "chrome"]
   },
   "extends": "../tsconfig.json",
