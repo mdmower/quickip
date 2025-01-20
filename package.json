@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "check-types": "tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck --project build/tsconfig.json && tsc --noEmit --project tests/tsconfig.json",
+    "check-types": "tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck --project build/tsconfig.json && tsc --noEmit --skipLibCheck --project tests/tsconfig.json",
     "format": "prettier --write .",
     "build": "tsx build/build.ts",
     "build-debug": "tsx build/build.ts --debug",
