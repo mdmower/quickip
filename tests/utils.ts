@@ -8,11 +8,6 @@ export const extensionPath = path.join(__dirname, '../dist/chrome');
 export const sampleIPv4 = '192.0.2.2';
 export const sampleIPv6 = '2001:DB8::2';
 
-export const puppeteerLaunchConfig: Parameters<typeof puppeteer.launch>[0] = {
-  headless: true,
-  args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
-};
-
 interface LaunchBrowserResult {
   browser: Browser;
   context: BrowserContext;
@@ -23,41 +18,42 @@ export async function launchBrowser(): Promise<LaunchBrowserResult> {
     throw new Error('Application must be built before running tests');
   }
 
-  const browser = await puppeteer.launch(puppeteerLaunchConfig);
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
+  });
   const context = browser.defaultBrowserContext();
 
   const workerTarget = await browser.waitForTarget(
     (target) => target.type() === TargetType.SERVICE_WORKER && target.url().endsWith('sw.js')
   );
-  const workerResult = await workerTarget.worker();
-  if (!workerResult) {
+  const worker = await workerTarget.worker();
+  if (!worker) {
     throw new Error('Worker not available');
   }
-  const worker = workerResult;
-
-  const ready = await waitForWorker(worker);
-  if (!ready) {
-    throw new Error('Worker not ready');
-  }
+  await waitForWorker(worker);
 
   return {browser, context, worker};
 }
 
-export async function waitForWorker(worker: WebWorker): Promise<boolean> {
-  let ready = false;
-
-  for (let i = 0; i < 10; i++) {
-    ready = await worker.evaluate(
-      () => typeof chrome !== 'undefined' && !!chrome.action?.openPopup
+export async function waitForWorker(worker: WebWorker): Promise<void> {
+  const maxWaits = 10;
+  for (let i = 0; i < maxWaits; i++) {
+    const ready = await worker.evaluate(
+      () =>
+        typeof self !== 'undefined' &&
+        self instanceof ServiceWorkerGlobalScope &&
+        self.serviceWorker.state === 'activated' &&
+        typeof chrome !== 'undefined' &&
+        !!chrome.action?.openPopup
     );
     if (!ready) {
-      await new Promise((resolve) => setTimeout(resolve, 25));
+      if (i >= maxWaits) throw new Error('Worker not ready');
+      await new Promise((resolve) => setTimeout(resolve, 50));
     } else {
-      continue;
+      break;
     }
   }
-
-  return ready;
 }
 
 export function getDefaultStorageData(): StorageData {

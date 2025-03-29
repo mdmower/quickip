@@ -65,6 +65,12 @@ describe('Bubble', () => {
     page = await bubbleTarget.asPage();
     await page.setRequestInterception(true);
     page.on('request', mockRequestHandler);
+
+    await page.waitForNetworkIdle();
+    await page.waitForSelector('input', {
+      timeout: 100,
+      visible: true,
+    });
     await page.evaluate(() => navigator.clipboard.writeText(''));
   });
 
@@ -94,11 +100,9 @@ describe('Bubble', () => {
   });
 
   it('should show loading messages', async () => {
-    await page.waitForNetworkIdle();
     page.off('request', mockRequestHandler);
     page.on('request', (request) => mockRequestHandler(request, 500));
     await page.reload({waitUntil: 'load'});
-
     await page.waitForSelector('input', {
       timeout: 100,
       visible: true,
@@ -115,8 +119,6 @@ describe('Bubble', () => {
   });
 
   it('should find IPs', async () => {
-    await page.waitForNetworkIdle();
-
     const evalInputs = await page.$$eval('input', (inputs) =>
       inputs.map((el) => ({value: el.value}))
     );
@@ -127,7 +129,6 @@ describe('Bubble', () => {
   });
 
   it('should copy IPs', async () => {
-    await page.waitForNetworkIdle();
     await context.overridePermissions(page.url(), ['clipboard-read']);
 
     const evalInputs = await page.$$eval('input', (inputs) =>
@@ -147,7 +148,6 @@ describe('Bubble', () => {
   });
 
   it('should focus first copy button', async () => {
-    await page.waitForNetworkIdle();
     await page.keyboard.type(' ');
 
     const ip = await page.$eval('input', (input) => input.value);
@@ -159,8 +159,6 @@ describe('Bubble', () => {
   });
 
   it('should only show enabled IP version(s)', async () => {
-    await page.waitForNetworkIdle();
-
     let $inputs = await page.$$('input');
     expect($inputs).toHaveLength(2);
 
@@ -186,8 +184,6 @@ describe('Bubble', () => {
   });
 
   it('should skip disabled resolvers', async () => {
-    await page.waitForNetworkIdle();
-
     const sources4 = getDefaultSources(IpVersionIndex.V4).sort((a, b) => a.order - b.order);
     const sources6 = getDefaultSources(IpVersionIndex.V6).sort((a, b) => a.order - b.order);
     const settings = getDefaultStorageData();
@@ -204,8 +200,6 @@ describe('Bubble', () => {
   });
 
   it('should respect resolver order', async () => {
-    await page.waitForNetworkIdle();
-
     const sources4 = getDefaultSources(IpVersionIndex.V4).sort((a, b) => a.order - b.order);
     const sources6 = getDefaultSources(IpVersionIndex.V6).sort((a, b) => a.order - b.order);
     const settings = getDefaultStorageData();
@@ -227,7 +221,6 @@ describe('Bubble', () => {
 
   // This test disables mock responses and verifies all sources are still working. It is skipped by default
   // to avoid abusing sources.
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should get valid IPs from all sources', async () => {
     page.off('request', mockRequestHandler);
     await page.setRequestInterception(false);

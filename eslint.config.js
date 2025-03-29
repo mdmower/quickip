@@ -4,7 +4,7 @@ import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import jsdoc from 'eslint-plugin-jsdoc';
-import jest from 'eslint-plugin-jest';
+import vitest from '@vitest/eslint-plugin';
 import prettierConfigRecommended from 'eslint-plugin-prettier/recommended';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
 
@@ -101,17 +101,7 @@ export default tseslint.config(
   },
   {
     files: ['tests/**/*.ts'],
-    ...jest.configs['flat/recommended'],
-  },
-  {
-    files: ['tests/**/*.ts'],
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-        ...globals.node,
-        ...globals.browser,
-      },
-    },
+    ...vitest.configs.recommended,
   },
   prettierConfigRecommended
 );

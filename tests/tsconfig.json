@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["ES2022", "DOM"],
-    "types": ["node", "jest", "chrome"]
+    "lib": ["ES2022", "DOM", "WebWorker"],
+    "types": ["node", "vitest/globals", "chrome"]
   },
   "extends": "../tsconfig.json",
   "include": ["**/*", "../src/lib/interfaces.ts", "../src/lib/default-sources.json"],
