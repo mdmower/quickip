@@ -66,7 +66,6 @@ describe('Bubble', () => {
     await page.setRequestInterception(true);
     page.on('request', mockRequestHandler);
 
-    await page.waitForNetworkIdle();
     await page.waitForSelector('input', {
       timeout: 100,
       visible: true,
@@ -76,7 +75,9 @@ describe('Bubble', () => {
 
   afterEach(async () => {
     await context.clearPermissionOverrides();
-    await page.close();
+    if (!page.isClosed()) {
+      await page.close();
+    }
   });
 
   afterAll(async () => {

@@ -42,7 +42,6 @@ describe('Options', () => {
       throw new Error('Options page did not open');
     }
     page = optionsPage;
-    await page.waitForNetworkIdle();
     await page.waitForSelector('#sources-container .col:nth-child(2)', {
       timeout: 100,
       visible: true,
@@ -50,7 +49,9 @@ describe('Options', () => {
   });
 
   afterEach(async () => {
-    await page.close();
+    if (!page.isClosed()) {
+      await page.close();
+    }
   });
 
   afterAll(async () => {
