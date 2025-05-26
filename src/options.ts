@@ -77,7 +77,7 @@ class QipOptions {
       callback: this.enableAllSources.bind(this),
     },
     {
-      selector: '#edge-keyboard-shortcut-config,#chrome-keyboard-shortcut-config',
+      selector: 'a[id$="-keyboard-shortcut-config"]',
       event: 'click',
       callback: this.openShortcutsConfig.bind(this),
     },
@@ -238,15 +238,21 @@ class QipOptions {
         : qipBrowser === 'edge'
           ? 'edge://extensions/shortcuts'
           : qipBrowser === 'firefox'
-            ? 'about:addons'
+            ? chrome.commands.openShortcutSettings
+              ? 'Firefox Settings: Manage Extension Shortcuts'
+              : 'about:addons'
             : '';
 
     if (text) {
-      const notice = document.getElementById(`${qipBrowser}-keyboard-shortcut-notice`);
+      const qipBrowserHtmlId =
+        qipBrowser === 'firefox' && !chrome.commands.openShortcutSettings
+          ? 'firefox-legacy'
+          : qipBrowser;
+      const notice = document.getElementById(`${qipBrowserHtmlId}-keyboard-shortcut-notice`);
       if (notice) {
         notice.classList.remove('d-none');
       }
-      const config = document.getElementById(`${qipBrowser}-keyboard-shortcut-config`);
+      const config = document.getElementById(`${qipBrowserHtmlId}-keyboard-shortcut-config`);
       if (config) {
         config.textContent = text;
       }
@@ -427,20 +433,15 @@ class QipOptions {
   private openShortcutsConfig(event: Event): void {
     event.preventDefault();
 
-    const url =
-      qipBrowser == 'chrome'
-        ? 'chrome://extensions/shortcuts'
-        : qipBrowser == 'edge'
-          ? 'edge://extensions/shortcuts'
-          : '';
-
-    if (!url) {
-      return;
+    if (qipBrowser === 'firefox') {
+      chrome.commands.openShortcutSettings?.().catch((error) => {
+        logWarn('Unable to open shortcuts configuration page\n', getErrorMessage(error));
+      });
+    } else {
+      chrome.tabs.create({url: `${qipBrowser}://extensions/shortcuts`}).catch((error) => {
+        logWarn('Unable to open shortcuts configuration page\n', getErrorMessage(error));
+      });
     }
-
-    chrome.tabs.create({url}).catch((error) => {
-      logWarn('Unable to open shortcuts configuration page\n', getErrorMessage(error));
-    });
   }
 
   /**
