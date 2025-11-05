@@ -3,12 +3,13 @@
 import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import {defineConfig} from 'eslint/config';
 import jsdoc from 'eslint-plugin-jsdoc';
 import vitest from '@vitest/eslint-plugin';
 import prettierConfigRecommended from 'eslint-plugin-prettier/recommended';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: ['dist/', 'pkg/'],
   },
@@ -73,7 +74,10 @@ export default tseslint.config(
       'jsdoc/require-jsdoc': 'off',
     },
   },
-  noUnsanitized.configs.recommended,
+  {
+    files: ['src/**/*.ts'],
+    ...noUnsanitized.configs.recommended,
+  },
   {
     files: ['src/**/*.ts', 'tests/**/*.ts'],
     languageOptions: {
