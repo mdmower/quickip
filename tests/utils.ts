@@ -19,8 +19,8 @@ export async function launchBrowser(): Promise<LaunchBrowserResult> {
   }
 
   const browser = await puppeteer.launch({
-    headless: true,
-    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
+    pipe: true,
+    enableExtensions: [extensionPath],
   });
   const context = browser.defaultBrowserContext();
 

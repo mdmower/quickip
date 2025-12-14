@@ -106,6 +106,9 @@ export default defineConfig(
   {
     files: ['tests/**/*.ts'],
     ...vitest.configs.recommended,
+    rules: {
+      'vitest/no-disabled-tests': 'off',
+    },
   },
   prettierConfigRecommended
 );

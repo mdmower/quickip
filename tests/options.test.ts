@@ -93,7 +93,7 @@ describe('Options', () => {
       await $select!.select(theme);
 
       const storage = await page.evaluate((s) => chrome.storage.sync.get(s), DisplayThemeSetting);
-      const storageValue = storage[DisplayThemeSetting] as unknown;
+      const storageValue = storage[DisplayThemeSetting];
       expect(storageValue).toBe(theme);
 
       const pageTheme = await page.$eval('html', (html) => html.dataset.bsTheme);
@@ -113,13 +113,13 @@ describe('Options', () => {
 
     await $inputs[0].click();
     const storage1 = await page.evaluate((s) => chrome.storage.sync.get(s), VersionStatesIndex);
-    const storageValue1 = storage1[VersionStatesIndex] as unknown;
+    const storageValue1 = storage1[VersionStatesIndex];
     expect(storageValue1).toEqual({[IpVersionIndex.V4]: false, [IpVersionIndex.V6]: true});
 
     // Both versions cannot be disabled
     await $inputs[1].click();
     const storage2 = await page.evaluate((s) => chrome.storage.sync.get(s), VersionStatesIndex);
-    const storageValue2 = storage2[VersionStatesIndex] as unknown;
+    const storageValue2 = storage2[VersionStatesIndex];
     expect(storageValue2).toEqual({[IpVersionIndex.V4]: true, [IpVersionIndex.V6]: false});
     await page.waitForSelector('#notice', {timeout: 100, visible: true});
     const noticeShown = await page.$eval(

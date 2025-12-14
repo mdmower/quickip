@@ -66,6 +66,7 @@ describe('Bubble', () => {
     await page.setRequestInterception(true);
     page.on('request', mockRequestHandler);
 
+    await page.waitForNetworkIdle();
     await page.waitForSelector('input', {
       timeout: 100,
       visible: true,
