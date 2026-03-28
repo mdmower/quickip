@@ -84,6 +84,7 @@ async function runWebpack(debug: boolean, browser: Browser): Promise<void> {
  * Build all the things
  */
 async function build() {
+  // eslint-disable-next-line no-useless-assignment
   let debug = false;
   const filteredBrowsers: Browser[] = [];
 
