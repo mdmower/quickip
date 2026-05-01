@@ -18,7 +18,7 @@ export async function getManifest(
   debug: boolean,
   browser: Browser
 ): Promise<chrome.runtime.ManifestV3> {
-  let manifest: chrome.runtime.ManifestV3 = {
+  let manifest = {
     action: {
       default_icon: {
         16: 'icons/icon16.png',
@@ -67,14 +67,14 @@ export async function getManifest(
       'https://*.wtfismyip.com/',
     ],
     version: packageJson.version,
-  };
+  } satisfies chrome.runtime.ManifestV3;
 
   // If local.manifest.json exists and this is a debug build, merge into manifest.
   if (debug) {
     const localManifestPath = path.join(dirRef.root, 'local.manifest.json');
     if (existsSync(localManifestPath)) {
       const localManifestJson = await readFile(localManifestPath, 'utf-8');
-      const localManifest = JSON.parse(localManifestJson) as chrome.runtime.ManifestV3;
+      const localManifest = JSON.parse(localManifestJson) as Partial<chrome.runtime.ManifestV3>;
       if (browser === 'firefox' && 'key' in localManifest) {
         delete localManifest.key;
       }
@@ -84,9 +84,10 @@ export async function getManifest(
 
   if (browser === 'firefox') {
     return deepmerge(manifest, {
+      // Firefox still uses background script in ManifestV3
       background: {
         scripts: ['background.js'],
-      },
+      } as unknown as chrome.runtime.ManifestV3['background'],
       browser_specific_settings: {
         gecko: {
           id: '{56f45803-b8a1-493c-b6e2-d915306e33eb}',
@@ -97,7 +98,7 @@ export async function getManifest(
         page: 'options.html',
         open_in_tab: true,
       },
-    });
+    } satisfies Partial<chrome.runtime.ManifestV3>);
   }
 
   return deepmerge(manifest, {
@@ -106,5 +107,5 @@ export async function getManifest(
     },
     options_page: 'options.html',
     permissions: ['offscreen'],
-  });
+  } satisfies Partial<chrome.runtime.ManifestV3>);
 }
