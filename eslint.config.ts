@@ -1,5 +1,3 @@
-// @ts-check
-
 import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -24,10 +22,6 @@ export default defineConfig(
   },
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
-  {
-    files: ['eslint.config.js'],
-    ...tseslint.configs.disableTypeChecked,
-  },
   {
     files: ['**/*.ts'],
     languageOptions: {

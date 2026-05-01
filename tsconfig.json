@@ -13,6 +13,11 @@
     "importHelpers": true,
     "types": ["node", "chrome"]
   },
-  "include": ["src/**/*", "vitest.config.ts"],
+  "include": [
+    "eslint-plugin-no-unsanitized.d.ts",
+    "eslint.config.ts",
+    "src/**/*",
+    "vitest.config.ts"
+  ],
   "exclude": ["node_modules"]
 }
