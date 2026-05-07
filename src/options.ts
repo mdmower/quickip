@@ -154,7 +154,7 @@ class QipOptions {
 
       const clone = document.importNode(template.content, true);
 
-      const titleNode = clone.querySelector<HTMLParagraphElement>('.title');
+      const titleNode = clone.querySelector<HTMLElement>('.title');
       if (titleNode) {
         titleNode.textContent = versionData.name;
       }
@@ -365,6 +365,8 @@ class QipOptions {
       return;
     }
 
+    event.preventDefault();
+
     const {id, version} = li.dataset;
     if (!id || !isIpVersionIndex(version)) {
       return;
@@ -385,7 +387,6 @@ class QipOptions {
       return;
     }
 
-    event.preventDefault();
     order.splice(index, 1);
     if (key === 'ArrowDown') {
       order.splice(index + 1, 0, id);
@@ -417,6 +418,10 @@ class QipOptions {
    */
   public async enableAllSourcesAsync(button: HTMLButtonElement): Promise<void> {
     const version = button.getAttribute('data-version') || '';
+    if (!isIpVersionIndex(version)) {
+      return;
+    }
+
     const inputs = document.querySelectorAll<HTMLInputElement>(
       `#sources-container input[data-version="${version}"]`
     );
