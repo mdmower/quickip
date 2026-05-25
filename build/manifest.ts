@@ -35,14 +35,14 @@ export async function getManifest(
       'quick-copy-ipv4': {
         suggested_key: {
           default: 'Ctrl+Shift+4',
-          mac: 'Command+Shift+4',
+          mac: 'MacCtrl+Shift+4',
         },
         description: 'Copy IPv4 to clipboard',
       },
       'quick-copy-ipv6': {
         suggested_key: {
           default: 'Ctrl+Shift+6',
-          mac: 'Command+Shift+6',
+          mac: 'MacCtrl+Shift+6',
         },
         description: 'Copy IPv6 to clipboard',
       },
