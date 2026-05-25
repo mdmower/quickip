@@ -41,12 +41,14 @@ export async function copyIpBackground(version: IpVersionIndex): Promise<void> {
 
   // The navigator.clipboard API requires that the window is focused, but
   // background documents cannot be focused. Fall back to old method.
-  // await navigator.clipboard.writeText(ip);
-  document.oncopy = function (event) {
-    if (event.clipboardData) {
-      event.clipboardData.setData('text/plain', ip);
-      event.preventDefault();
-    }
-  };
-  document.execCommand('copy', false, undefined);
+  await navigator.clipboard.writeText(ip).catch(() => {
+    logWarn('copyIp: navigator.clipboard write failed, falling back to document.execCommand.');
+    document.oncopy = function (event) {
+      if (event.clipboardData) {
+        event.clipboardData.setData('text/plain', ip);
+        event.preventDefault();
+      }
+    };
+    document.execCommand('copy', false, undefined);
+  });
 }
