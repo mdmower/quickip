@@ -149,9 +149,9 @@ class QipBubble {
       logError('Failed to copy IP to clipboard\n', getErrorMessage(error));
     });
 
-    input.focus();
+    input.select();
     setTimeout(() => {
-      input.blur();
+      input.setSelectionRange(0, 0);
       button.focus();
     }, 200);
   }
