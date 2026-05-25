@@ -26,10 +26,12 @@ export async function getIp(version: IpVersionIndex): Promise<string | undefined
         cache: 'no-store',
         signal: AbortSignal.timeout(fetchTimeout),
       });
-      const ip = (await response.text()).trim();
-      const validIp = version === IpVersionIndex.V6 ? isIPv6(ip) : isIPv4(ip);
-      if (validIp) {
-        return ip;
+      if (response.ok) {
+        const ip = (await response.text()).trim();
+        const validIp = version === IpVersionIndex.V6 ? isIPv6(ip) : isIPv4(ip);
+        if (validIp) {
+          return ip;
+        }
       }
       logWarn(`getIp: Invalid response from ${url}`);
     } catch (ex) {
