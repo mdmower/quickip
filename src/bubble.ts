@@ -112,7 +112,6 @@ class QipBubble {
     const ip = await getIp(version);
     if (ip) {
       input.value = ip;
-      input.style.minWidth = `${input.scrollWidth + 5}px`;
     } else {
       input.value = '';
       input.placeholder = 'Not found';
