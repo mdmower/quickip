@@ -12,6 +12,7 @@ body {
 #container {
   margin: 0.25rem;
   width: fit-content;
+  min-width: calc(250px - 0.5rem);
 }
 
 .ip {
