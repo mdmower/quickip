@@ -46,6 +46,7 @@ export function getViteConfigs(debug: boolean, browser: Browser): InlineConfig[]
 
   const htmlConfig: InlineConfig = deepmerge(commonConfig, {
     build: {
+      modulePreload: false,
       rolldownOptions: {
         input: htmlInputs,
         output: {
