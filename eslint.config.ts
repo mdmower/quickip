@@ -4,7 +4,6 @@ import tseslint from 'typescript-eslint';
 import {defineConfig} from 'eslint/config';
 import jsdoc from 'eslint-plugin-jsdoc';
 import vitest from '@vitest/eslint-plugin';
-import prettierConfigRecommended from 'eslint-plugin-prettier/recommended';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
 
 export default defineConfig(
@@ -103,6 +102,5 @@ export default defineConfig(
     rules: {
       'vitest/no-disabled-tests': 'off',
     },
-  },
-  prettierConfigRecommended
+  }
 );
