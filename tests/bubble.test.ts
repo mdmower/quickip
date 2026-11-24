@@ -223,6 +223,7 @@ describe('Bubble', () => {
 
   // This test disables mock responses and verifies all sources are still working. It is skipped by default
   // to avoid abusing sources.
+  // oxlint-disable-next-line vitest/no-disabled-tests
   it.skip('should get valid IPs from all sources', async () => {
     page.off('request', mockRequestHandler);
     await page.setRequestInterception(false);
