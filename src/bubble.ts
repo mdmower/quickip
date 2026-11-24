@@ -125,6 +125,9 @@ class QipBubble {
     const ip = await getIp(version);
     if (ip) {
       input.value = ip;
+      // Workaround Firefox not auto-expanding bubble to fit content
+      input.classList.toggle('ip');
+      input.classList.toggle('ip');
     } else {
       input.value = '';
       input.placeholder = 'Not found';
