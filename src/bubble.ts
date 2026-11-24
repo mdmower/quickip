@@ -25,9 +25,22 @@ class QipBubble {
    */
   public async init(): Promise<void> {
     await applyTheme(window);
+    this.padBody();
     await this.initOutputs();
     this.startListeners();
     await this.insertEnabledIPs();
+  }
+
+  /**
+   * Compensate for ridiculous amounts of browser bubble rounding (Firefox)
+   */
+  private padBody() {
+    const bodyRadiusStr = getComputedStyle(document.body).borderTopLeftRadius;
+    const bodyRadiusMatch = /^(\d+(?:\.\d*)?)px$/.exec(bodyRadiusStr);
+    const bodyRadius = bodyRadiusMatch ? parseFloat(bodyRadiusMatch[1]) : 0;
+    if (bodyRadius > 10) {
+      document.body.classList.add('extra-padding');
+    }
   }
 
   /**

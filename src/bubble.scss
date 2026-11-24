@@ -7,6 +7,10 @@
 body {
   min-width: 250px;
   overflow-x: hidden;
+
+  &.extra-padding {
+    padding: 2px 8px;
+  }
 }
 
 #container {
