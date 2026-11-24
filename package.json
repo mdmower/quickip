@@ -55,7 +55,7 @@
     "oxlint": "^1.95.0",
     "oxlint-tsgolint": "^7.0.2008",
     "puppeteer": "^25.18.1",
-    "sass": "^1.108.2",
+    "sass-embedded": "^1.108.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
