@@ -104,6 +104,8 @@ dist
 .tern-port
 
 # Custom
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 pkg
 local.manifest.json
